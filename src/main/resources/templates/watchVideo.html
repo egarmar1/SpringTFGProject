@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" style="height: 100%">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Candidate Dashboard</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/styles.css}"/>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/font-awesome.min.css}"/>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+
+<body th:object="${attackDetails}" style="font-family: 'Montserrat';height: 100%">
+
+<header class="navbar navbar-expand-lg navbar-dark">
+    <label class="mt-2 ms-5 font-weight-bold h5"
+    ><a href="/dashboard/">HackWeb</a
+    ><span class="logo_com font-weight-bold h5" style="color: white">
+          .com</span
+    ></label
+    >
+    <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarTogglerDemo02"
+            aria-controls="navbarTogglerDemo02"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarToggler">
+        <ul class="navbar-nav m-auto mt-2 mt-lg-0">
+
+            <li class="nav-item active">
+                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
+                ><i class="fas fa-search"></i>Search for Attacks</a
+                >
+            </li>
+            <li class="nav-item ">
+                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/saved-attacks/}">
+                    <i class="fa-solid fa-eye"></i>View Saved Attacks</a>
+            </li>
+            <li class="nav-item ">
+                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/user-profile/}">
+                    <i class="fa-solid fa-pencil"></i>Edit Profile</a>
+            </li>
+
+            <li class="nav-item ">
+                <a sec:authorize="hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/add}"
+                ><i class="fa-solid fa-file-circle-plus"></i>Post New Attack</a
+                >
+            </li>
+            <li class="nav-item active">
+                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
+                > <i class="fa-solid fa-eye"></i>View Your Attacks</a
+                >
+            </li>
+            <!--            <li class="nav-item ">-->
+            <!--                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/recruiter-profile/}"-->
+            <!--                > <i class="fa-solid fa-pencil"></i>Edit Account</a-->
+            <!--                >-->
+            <!--            </li>-->
+
+
+        </ul>
+        <img
+                class="rounded-circle me-3"
+                height="50px"
+                width="50x"
+                th:src="@{${user.photoImagePath}}"
+        />
+        <label th:text="${user.firstName+' '+user.lastName}" class="nav-item nav-link px-2 me-3">John Doe</label>
+
+        <button class="myBtn-light me-5" onclick="window.location.href='/logout'">Logout</button>
+    </div>
+</header>
+
+
+<!-- header-end -->
+<section class="section">
+    <!--    Side Bar Starts here    -->
+    <div class="sidenav px-5">
+        <div>
+            <hr/>
+        </div>
+    </div>
+    <article>
+        <div class="box px-3">
+            <a class="mt-3 ms-3 primary" id="back-link"><i class="fa-solid fa-angle-left me-1"></i> Volver a la búsqueda anterior </a>
+            <h1 class="primary-title mt-3"> Info del Vídeo </h1>
+            <div class="ms-3">
+                <h4 th:text="${videoDetails.title}" class="job-title text-left">The first Sql Video</h4>
+                <div class="mt-1">
+                    <!--                    <p th:text="${attackDetails.jobLocation.city+', '+ jobDetails.jobLocation.state}"-->
+                    <!--                       class="m-0"> California, USA</p>-->
+                    <!--                    <p th:text="${jobDetails.jobCompany.name}">Company</p>-->
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${param.justSaved}" class="alert alert-success">
+            Video guardado
+        </div>
+
+        <div th:if="${param.justUnsaved}" class="alert alert-warning">
+            Video eliminado de guardados
+        </div>
+
+        <div th:if="${param.justWatched}" class="alert alert-success">
+            Video terminado
+        </div>
+
+        <div th:if="${param.justUnwatched}" class="alert alert-warning">
+            Video no terminado
+        </div>-
+
+        <div class="box mt-3">
+            <label class="large-label px-3 mt-3"> Detalles del Video </label>
+
+            <div class="row mt-3">
+                <div class="col-md-12 text-center">
+                    <video width="600" controls>
+                        <source th:src="@{/videos/{videoFile}(videoFile=${videoDetails.videoFile})}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+
+
+            <div class="mt-3 px-3" sec:authorize="hasAuthority('Student')">
+                <div class="row row justify-content-center">
+                    <div class="col-md-3">
+
+                        <form th:action="@{/video/save/{id}(id=${videoDetails.id})}" method="post">
+                            <button class="btn-sec btn-black w-100" type="submit" th:if="${videoDetails.saved == false}">Guardar
+                            </button>
+                        </form>
+
+                        <form th:action="@{/video/unsave/{id}(id=${videoDetails.id})}" method="post">
+                            <button class="btn-sec btn-red w-100" type="submit" th:if="${videoDetails.saved == true}">Quitar de guardados
+                            </button>
+                        </form>
+
+                    </div>
+                    <div class="col-md-3">
+                        <form th:action="@{/video/markWatched/{id}(id=${videoDetails.id})}" method="post">
+                            <button class="btn-sec btn-black w-100" type="submit" th:if="${videoDetails.completed == false}">Marcar como visto
+                            </button>
+                        </form>
+
+                        <form th:action="@{/video/unmarkWatched/{id}(id=${videoDetails.id})}" method="post">
+                            <button class="btn-sec btn-red w-100" type="submit" th:if="${videoDetails.completed == true}">Marcar como no visto
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </article>
+</section>
+
+
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
+<script>
+    var element = document.getElementById('back-link');
+    element.setAttribute('href', document.referrer);
+    element.onclick = function() {
+      history.back();
+      return false;
+    }
+</script>
+</body>
+</html>
