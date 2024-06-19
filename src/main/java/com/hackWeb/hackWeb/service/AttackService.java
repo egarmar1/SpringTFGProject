@@ -2,6 +2,7 @@ package com.hackWeb.hackWeb.service;
 
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.repository.AttackRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -56,5 +57,10 @@ public class AttackService {
 
         System.out.println("Vale este es el postedDate que estamos cogiendo: " + iAttack.getPostedDate());
         return convertToAttackDto(iAttack);
+    }
+
+    @Transactional
+    public void save(Attack attack) {
+        attackRepository.save(attack);
     }
 }

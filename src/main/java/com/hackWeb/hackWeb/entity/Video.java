@@ -2,8 +2,6 @@ package com.hackWeb.hackWeb.entity;
 
 import jakarta.persistence.*;
 
-import java.lang.reflect.Type;
-
 @Entity
 @Table(name = "video")
 public class Video {
@@ -17,7 +15,7 @@ public class Video {
     private String title;
 
     private String difficulty;
-    private String video_file;
+    private String videoFile;
 
     @OneToOne
     @JoinColumn(name = "attack_id")
@@ -30,11 +28,11 @@ public class Video {
     public Video() {
     }
 
-    public Video(int id, String title, String difficulty, String video_file, TypeAttack typeAttack, Attack attack, TypeAttack typeAttack1) {
+    public Video(int id, String title, String difficulty, String videoFile, TypeAttack typeAttack, Attack attack, TypeAttack typeAttack1) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
-        this.video_file = video_file;
+        this.videoFile = videoFile;
         this.attack = attack;
         this.typeAttack = typeAttack1;
     }
@@ -63,12 +61,12 @@ public class Video {
         this.difficulty = difficulty;
     }
 
-    public String getVideo_file() {
-        return video_file;
+    public String getVideoFile() {
+        return videoFile;
     }
 
-    public void setVideo_file(String video_file) {
-        this.video_file = video_file;
+    public void setVideoFile(String videoFile) {
+        this.videoFile = videoFile;
     }
 
 
@@ -78,7 +76,7 @@ public class Video {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", difficulty='" + difficulty + '\'' +
-                ", video_file='" + video_file + '\'' +
+                ", videoFile='" + videoFile + '\'' +
                 '}';
     }
 

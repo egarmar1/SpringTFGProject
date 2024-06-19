@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class UserAttackController {
@@ -38,32 +39,38 @@ public class UserAttackController {
     @GetMapping("/saved-attacks/")
     public String savedJobs(Model model) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String username = authentication.getName();
         User user = userService.getCurrentUser();
 
         String attackBar = "";
-        String easy = "Easy";
-        String medium = "Medium";
-        String hard = "Hard";
+
+        List<String> difficulties = Arrays.asList("Easy", "Medium", "Hard");
         List<String> namesTypeAttacks = typeAttackService.getAllNames();
 
-        List<AttackDto> attacksDtoSearched = attackService.searchDto(attackBar, Arrays.asList(easy, medium, hard), namesTypeAttacks, user.getId());
-        List<AttackDto> attackToShow = new ArrayList<>();
+        List<AttackDto> attacksDtoSearched = attackService.searchDto(attackBar, difficulties, namesTypeAttacks, user.getId());
+//        List<AttackDto> attackToShow = new ArrayList<>();
+//
+//
+//        for(AttackDto attackDto : attacksDtoSearched){
+//            Attack attack = attackService.getOneById(attackDto.getId());
+//            List<UserAttack> userAttacks = attack.getUserAttacks();
+//
+//            for(UserAttack userAttack: userAttacks){
+//                if(userAttack.getUserAttackId().getUserId() == user.getId() && userAttack.isSaved()){
+//                    attackToShow.add(attackDto);
+//                    break;
+//                }
+//            }
+//
+//        }
 
-        for(AttackDto attackDto : attacksDtoSearched){
-            Attack attack = attackService.getOneById(attackDto.getId());
-            List<UserAttack> userAttacks = attack.getUserAttacks();
-
-            for(UserAttack userAttack: userAttacks){
-                if(userAttack.getUserAttackId().getUserId() == user.getId() && userAttack.isSaved()){
-                    attackToShow.add(attackDto);
-                    break;
-                }
-            }
-
-        }
+        List<AttackDto> attackToShow = attacksDtoSearched.stream()
+                        .filter(attackDto -> {
+                            Attack attack = attackService.getOneById(attackDto.getId());
+                            return attack.getUserAttacks().stream()
+                                    .anyMatch( userAttack -> userAttack.getUserAttackId().getUserId() == user.getId() && userAttack.isSaved());
+                        })
+                                .collect(Collectors.toList());
 
         model.addAttribute("user", user.getUserProfile());
 

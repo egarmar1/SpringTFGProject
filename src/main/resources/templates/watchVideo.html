@@ -18,71 +18,7 @@
 
 <body th:object="${attackDetails}" style="font-family: 'Montserrat';height: 100%">
 
-<header class="navbar navbar-expand-lg navbar-dark">
-    <label class="mt-2 ms-5 font-weight-bold h5"
-    ><a href="/dashboard/">HackWeb</a
-    ><span class="logo_com font-weight-bold h5" style="color: white">
-          .com</span
-    ></label
-    >
-    <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarTogglerDemo02"
-            aria-controls="navbarTogglerDemo02"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-    >
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarToggler">
-        <ul class="navbar-nav m-auto mt-2 mt-lg-0">
-
-            <li class="nav-item active">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
-                ><i class="fas fa-search"></i>Search for Attacks</a
-                >
-            </li>
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/saved-attacks/}">
-                    <i class="fa-solid fa-eye"></i>View Saved Attacks</a>
-            </li>
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/user-profile/}">
-                    <i class="fa-solid fa-pencil"></i>Edit Profile</a>
-            </li>
-
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/add}"
-                ><i class="fa-solid fa-file-circle-plus"></i>Post New Attack</a
-                >
-            </li>
-            <li class="nav-item active">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
-                > <i class="fa-solid fa-eye"></i>View Your Attacks</a
-                >
-            </li>
-            <!--            <li class="nav-item ">-->
-            <!--                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/recruiter-profile/}"-->
-            <!--                > <i class="fa-solid fa-pencil"></i>Edit Account</a-->
-            <!--                >-->
-            <!--            </li>-->
-
-
-        </ul>
-        <img
-                class="rounded-circle me-3"
-                height="50px"
-                width="50x"
-                th:src="@{${user.photoImagePath}}"
-        />
-        <label th:text="${user.firstName+' '+user.lastName}" class="nav-item nav-link px-2 me-3">John Doe</label>
-
-        <button class="myBtn-light me-5" onclick="window.location.href='/logout'">Logout</button>
-    </div>
-</header>
+<div th:insert="fragments.html :: header"></div>
 
 
 <!-- header-end -->
@@ -99,10 +35,11 @@
             <h1 class="primary-title mt-3"> Info del Vídeo </h1>
             <div class="ms-3">
                 <h4 th:text="${videoDetails.title}" class="job-title text-left">The first Sql Video</h4>
-                <div class="mt-1">
-                    <!--                    <p th:text="${attackDetails.jobLocation.city+', '+ jobDetails.jobLocation.state}"-->
-                    <!--                       class="m-0"> California, USA</p>-->
-                    <!--                    <p th:text="${jobDetails.jobCompany.name}">Company</p>-->
+
+
+                <div class="mt-3">
+                    <h5>Link to the attack:</h5>
+                    <a th:href="@{'/attack-details/' + ${videoDetails.attack.id}}" class="link-primary">Go to Attack Details</a>
                 </div>
             </div>
         </div>
@@ -121,7 +58,7 @@
 
         <div th:if="${param.justUnwatched}" class="alert alert-warning">
             Video no terminado
-        </div>-
+        </div>
 
         <div class="box mt-3">
             <label class="large-label px-3 mt-3"> Detalles del Video </label>

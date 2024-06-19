@@ -5,6 +5,9 @@ import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class VideoService {
 
@@ -20,6 +23,15 @@ public class VideoService {
         IVideo iVideo = videoRepository.getOneByVideoIdAndUserId(videoId,userId);
 
         return  convertToVideoDto(iVideo);
+    }
+
+    public List<VideoDto> getAllByUserId(int userId){
+        List<IVideo> iVideos = videoRepository.getAllByUserId(userId);
+
+        return iVideos.stream()
+                .map(this::convertToVideoDto)
+                .toList();
+
     }
 
     private VideoDto convertToVideoDto(IVideo ia){

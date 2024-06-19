@@ -47,7 +47,7 @@ CREATE TABLE type_attack (
 );
 
 CREATE TABLE attack (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     difficulty VARCHAR(50) NOT NULL,
     type_attack_id INT,
@@ -55,9 +55,10 @@ CREATE TABLE attack (
     posted_date DATE,
     pre_video_id INT,
     solution_video_id INT,
+    laboratory_url VARCHAR(255),
 	FOREIGN KEY (type_attack_id) references type_attack(id),
-    FOREIGN KEY (pre_video_id) references attack(id),
-    FOREIGN KEY (solution_video_id) references attack(id)
+    FOREIGN KEY (pre_video_id) references video(id),
+    FOREIGN KEY (solution_video_id) references video(id)
 
 );
 
@@ -87,9 +88,9 @@ CREATE TABLE user_video(
     video_id INT NOT NULL,
     saved tinyint(1),
     completed tinyint(1),
-    PRIMARY KEY(user_id, video_id)
+    PRIMARY KEY(user_id, video_id),
     FOREIGN KEY(user_id) references user(id),
-    FOREIGN KEY(vide_id) references video(id)
+    FOREIGN KEY(video_id) references video(id)
 );
 -- Introducimos roles
 INSERT INTO user_type (name) VALUES ("Admin");
@@ -112,7 +113,7 @@ INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, pre_video_id,
 
 -- Introducimos usuarios
 INSERT INTO hackweb.user (id, email, is_active, password, registration_date, user_type_id) VALUES
-(1, 'test@gmail.com', 1, '$2a$10$NqLlFiR.OzplBL0.M794BeXnyUl/cJEgLtHKlPbuVcAmCBf0DI3Ni', '2024-06-12', 2),
+(1, 'test@gmail.com', 1, '$2a$10$NqLlFiR.OzplBL0.M794BeXnyUl/cJEgLtHKlPbuVcAmCBf0DI3Ni', '2024-06-12', 1),
 (2, 'egarmar1@teleco.upv.es', 1, '$2a$10$E420hHUt.4JfNNz.kJqt7OOTMPJMg8AXTpgGmpbMWv7JXuhJsIFu', '2024-06-12', 2),
 (3, 'adsf@f.com', 1, '$2a$10$yfA22NM5Y47e5ieyUbAXueQJZsNfKba6J7lWZ1hNq6ffPDlpJ9G', '2024-06-12', 2),
 (4, 'errgar2001@gmail.com', 1, '$2a$10$eDvc62s90uqZzZsNjHszhUonvTbnCEaBabkJ/0ksEKyO2TTNDOW', '2024-06-12', 2);

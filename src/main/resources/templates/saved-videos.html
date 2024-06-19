@@ -30,53 +30,48 @@
     <article>
 
         <div class="box">
-            <h1 class="primary-title">Saved Attacks</h1>
+            <h1 class="primary-title">Saved videos</h1>
         </div>
 
         <div class="box mt-3">
             <label class="large-label px-3 mb-3" sec:authorize="hasAuthority('Student') or hasAuthority('Admin')">Resultados de la
                 búsqueda</label>
-            <th:block th:each="attack:${attacks}">
+            <th:block th:each="video:${videos}">
                 <a
-                        th:href="@{/attack-details/{id}(id=${attack.id})}"
+                        th:href="@{/video/watch/{id}(id=${video.id})}"
                         style="text-decoration: none; color: black"
                 >
                     <div
-                            onclick="window.location=/attack-details/{id}(id=${attack.id})"
+                            onclick="window.location=/video/watch/{id}(id=${video.id})"
                             class="job-row"
                     >
                         <div class="row">
                             <div class="col-md-4">
                                 <label class="job-title text-left">
-                                    [[${attack.title}]]
-                                    <span
-                                            class="title-span"
-                                            th:text="'('+ @{${attack.totalStudentsCompleted}}+' Estudiantes los han resuelto)'"
-                                    >(xx Estudiantes los han resuelto)</span
-                                    >
+                                    [[${video.title}]]
                                     <span
                                             class="title-span"
                                             sec:authorize="hasAuthority('Student') or hasAuthority('Admin')"
-                                            th:if="${attack.isCompleted == true}"
+                                            th:if="${video.isCompleted == true}"
                                     >(Superado)</span
                                     >
                                     <span
                                             class="title-span"
                                             sec:authorize="hasAuthority('Student') or hasAuthority('Admin')"
-                                            th:if="${attack.isSaved == true}"
+                                            th:if="${video.isSaved == true}"
                                     >(Guardado)</span
                                     >
                                 </label>
                             </div>
                             <div class="col-md-4 text-center">
                                 <label
-                                        th:text="${attack.typeAttack.name}"
+                                        th:text="${video.typeAttack.name}"
                                 >
                                     Tipo de ataque</label
                                 >
                             </div>
                             <div class="col-md-4 text-right">
-                                <label th:text="@{${attack.difficulty}}"
+                                <label th:text="@{${video.difficulty}}"
                                 >Admin Difficulty</label
                                 >
                             </div>
@@ -108,14 +103,14 @@
 ></script>
 <script type="text/javascript" th:src="@{/js/main.js}"></script>
 
-<script>
+<!--<script>-->
 
-    $('#job').change(function() {
-      $('#hidJob').val($(this).val());
-    });
-    $('#loc').change(function() {
-      $('#hidLoc').val($(this).val());
-    });
-</script>
+<!--    $('#job').change(function() {-->
+<!--      $('#hidJob').val($(this).val());-->
+<!--    });-->
+<!--    $('#loc').change(function() {-->
+<!--      $('#hidLoc').val($(this).val());-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>

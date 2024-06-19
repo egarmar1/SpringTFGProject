@@ -17,73 +17,7 @@
 </head>
 
 <body th:object="${attackDetails}" style="font-family: 'Montserrat';height: 100%">
-
-<header class="navbar navbar-expand-lg navbar-dark">
-    <label class="mt-2 ms-5 font-weight-bold h5"
-    ><a href="/dashboard/">HackWeb</a
-    ><span class="logo_com font-weight-bold h5" style="color: white">
-          .com</span
-    ></label
-    >
-    <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarTogglerDemo02"
-            aria-controls="navbarTogglerDemo02"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-    >
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarToggler">
-        <ul class="navbar-nav m-auto mt-2 mt-lg-0">
-
-            <li class="nav-item active">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
-                ><i class="fas fa-search"></i>Search for Attacks</a
-                >
-            </li>
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/saved-attacks/}">
-                    <i class="fa-solid fa-eye"></i>View Saved Attacks</a>
-            </li>
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/user-profile/}">
-                    <i class="fa-solid fa-pencil"></i>Edit Profile</a>
-            </li>
-
-            <li class="nav-item ">
-                <a sec:authorize="hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/add}"
-                ><i class="fa-solid fa-file-circle-plus"></i>Post New Attack</a
-                >
-            </li>
-            <li class="nav-item active">
-                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/dashboard/}"
-                > <i class="fa-solid fa-eye"></i>View Your Attacks</a
-                >
-            </li>
-<!--            <li class="nav-item ">-->
-<!--                <a sec:authorize="hasAuthority('Student') or hasAuthority('Admin')" class="nav-link" th:href="@{/recruiter-profile/}"-->
-<!--                > <i class="fa-solid fa-pencil"></i>Edit Account</a-->
-<!--                >-->
-<!--            </li>-->
-
-
-        </ul>
-        <img
-                class="rounded-circle me-3"
-                height="50px"
-                width="50x"
-                th:src="@{${user.photoImagePath}}"
-        />
-        <label th:text="${user.firstName+' '+user.lastName}" class="nav-item nav-link px-2 me-3">John Doe</label>
-
-        <button class="myBtn-light me-5" onclick="window.location.href='/logout'">Logout</button>
-    </div>
-</header>
-
+<div th:insert="fragments.html :: header"></div>
 
 <!-- header-end -->
 <section class="section">
@@ -166,7 +100,7 @@
 
 
             <div class="mt-3 px-3" >
-                <div class="row">
+                <div class="row justify-content-center">
                     <div class="col-md-3">
 
                         <form th:action="@{/attack-details/save/{id}(id=${attackDetails.id})}" method="post">
@@ -197,15 +131,15 @@
             </div>
 
             <div class="mt-3 px-3" sec:authorize="hasAuthority('Admin')">
-                <div class="row">
+                <div class="row justify-content-center">
                     <div class="col-md-3">
                         <form th:action="@{/dashboard/edit/{id}(id=${attackDetails.id})}" method="post">
-                            <button class="btn-sec btn-red w-100" type="submit">Edit Attack</button>
+                            <button class="btn-sec btn-red w-100" type="submit">Editar Ataque</button>
                         </form>
                     </div>
                     <div class="col-md-3">
                         <form th:action="@{/dashboard/deleteAttack/{id}(id=${attackDetails.id})}" method="post">
-                            <button class="btn-sec btn-black w-100" type="submit">Delete Attack</button>
+                            <button class="btn-sec btn-black w-100" type="submit">Eliminar ataque</button>
                         </form>
                     </div>
                 </div>

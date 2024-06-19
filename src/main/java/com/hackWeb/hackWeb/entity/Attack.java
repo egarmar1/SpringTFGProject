@@ -22,11 +22,11 @@ public class Attack {
     @Length(max = 10000)
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "pre_video_id")
     private Video preVideo;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "solution_video_id")
     private Video solutionVideo;
 
@@ -35,6 +35,9 @@ public class Attack {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "type_attack_id")
     private TypeAttack typeAttack;
+
+
+    private String laboratoryUrl;
 
 
 
@@ -51,7 +54,7 @@ public class Attack {
         this.title = title;
     }
 
-    public Attack(int id, String title, String difficulty, String description, Video preVideo, Video solutionVideo, Date postedDate, TypeAttack typeAttack, List<UserAttack> userAttacks) {
+    public Attack(int id, String title, String difficulty, String description, Video preVideo, Video solutionVideo, Date postedDate, TypeAttack typeAttack, String laboratoryUrl, List<UserAttack> userAttacks) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
@@ -60,6 +63,7 @@ public class Attack {
         this.solutionVideo = solutionVideo;
         this.posted_date = postedDate;
         this.typeAttack = typeAttack;
+        this.laboratoryUrl = laboratoryUrl;
         this.userAttacks = userAttacks;
     }
 
@@ -149,4 +153,11 @@ public class Attack {
     }
 
 
+    public String getLaboratoryUrl() {
+        return laboratoryUrl;
+    }
+
+    public void setLaboratoryUrl(String laboratoryUrl) {
+        this.laboratoryUrl = laboratoryUrl;
+    }
 }
