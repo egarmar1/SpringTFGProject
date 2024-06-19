@@ -1,5 +1,6 @@
 package com.hackWeb.hackWeb.entity;
 
+import com.hackWeb.hackWeb.entity.enums.VideoType;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,22 +18,30 @@ public class Video {
     private String difficulty;
     private String videoFile;
 
+    @Enumerated(EnumType.STRING)
+    private VideoType type;
+
     @OneToOne
     @JoinColumn(name = "attack_id")
     private Attack attack;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "type_attack_id")
     private TypeAttack typeAttack;
 
     public Video() {
     }
+    public Video(Attack attack, VideoType type) {
+        this.attack = attack;
+        this.type = type;
+    }
 
-    public Video(int id, String title, String difficulty, String videoFile, TypeAttack typeAttack, Attack attack, TypeAttack typeAttack1) {
+    public Video(int id, String title, String difficulty, String videoFile, TypeAttack typeAttack, VideoType type, Attack attack, TypeAttack typeAttack1) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
         this.videoFile = videoFile;
+        this.type = type;
         this.attack = attack;
         this.typeAttack = typeAttack1;
     }
@@ -94,5 +103,13 @@ public class Video {
 
     public void setTypeAttack(TypeAttack typeAttack) {
         this.typeAttack = typeAttack;
+    }
+
+    public VideoType getType() {
+        return type;
+    }
+
+    public void setType(VideoType type) {
+        this.type = type;
     }
 }

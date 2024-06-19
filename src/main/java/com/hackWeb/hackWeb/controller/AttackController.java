@@ -1,6 +1,7 @@
 package com.hackWeb.hackWeb.controller;
 
 import com.hackWeb.hackWeb.entity.*;
+import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.service.AttackService;
 import com.hackWeb.hackWeb.service.TypeAttackService;
 import com.hackWeb.hackWeb.service.UserAttackService;
@@ -142,44 +143,57 @@ public class AttackController {
     }
 
 
-    @PostMapping("/attack/addNew")
-    public String addNewAttack(Attack attack,
-                               @RequestParam("preVideoFile") MultipartFile preVideoFile,
-                               @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile) {
+        @PostMapping("/attack/addNew")
+        public String addNewAttack(Attack attack,
+                                   @RequestParam("preVideoFile") MultipartFile preVideoFile,
+                                   @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile) {
 
-        Video preVideo = attack.getPreVideo();
-        Video solutionVideo = attack.getSolutionVideo();
+            Video preVideo = attack.getVideos().stream()
+                    .filter( video -> video.getType() == VideoType.PRE).findFirst().orElse(new Video(attack, VideoType.PRE));
 
-        preVideo.setDifficulty(attack.getDifficulty());
-        solutionVideo.setDifficulty(attack.getDifficulty());
+            Video solutionVideo = attack.getVideos().stream()
+                    .filter( video -> video.getType() == VideoType.SOLUTION).findFirst().orElse(new Video(attack, VideoType.SOLUTION));
 
-        String preFileName = "";
-        String solutionFileName = "";
-        if(!Objects.equals(preVideoFile.getOriginalFilename(), "")){
-            preFileName = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-            preVideo.setVideoFile(preFileName);
+
+
+
+            preVideo.setDifficulty(attack.getDifficulty());
+            solutionVideo.setDifficulty(attack.getDifficulty());
+
+            String preFileName = "";
+            String solutionFileName = "";
+            if(!Objects.equals(preVideoFile.getOriginalFilename(), "")){
+                preFileName = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                preVideo.setVideoFile(preFileName);
+            }
+
+            if(!Objects.equals(solutionVideoFile.getOriginalFilename(), "")){
+                solutionFileName = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                solutionVideo.setVideoFile(solutionFileName);
+            }
+
+            attack.setPosted_date(new Date());
+
+
+            System.out.println("El attack es: " + attack);
+            System.out.println("El preVideo es: " + preVideo.getAttack());
+            System.out.println("El solutionVideo es: " + solutionVideo);
+
+
+            attackService.save(attack);
+
+            String uploadDir = "videos/attack/" + attack.getId();
+
+            try{
+                FileUploadUtil.saveFile(uploadDir,preFileName,preVideoFile);
+                FileUploadUtil.saveFile(uploadDir,solutionFileName,solutionVideoFile);
+            }catch (Exception exc){
+                exc.printStackTrace();
+            }
+
+
+            return "dashboard";
         }
-
-        if(!Objects.equals(solutionVideoFile.getOriginalFilename(), "")){
-            solutionFileName = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-            solutionVideo.setVideoFile(solutionFileName);
-        }
-
-        attack.setPosted_date(new Date());
-        attackService.save(attack);
-
-        String uploadDir = "videos/attack/" + attack.getId();
-
-        try{
-            FileUploadUtil.saveFile(uploadDir,preFileName,preVideoFile);
-            FileUploadUtil.saveFile(uploadDir,solutionFileName,solutionVideoFile);
-        }catch (Exception exc){
-            exc.printStackTrace();
-        }
-
-
-        return "dashboard";
-    }
 
 
 }

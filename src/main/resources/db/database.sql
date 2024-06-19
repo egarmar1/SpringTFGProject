@@ -53,13 +53,8 @@ CREATE TABLE attack (
     type_attack_id INT,
     description VARCHAR(10000),
     posted_date DATE,
-    pre_video_id INT,
-    solution_video_id INT,
     laboratory_url VARCHAR(255),
-	FOREIGN KEY (type_attack_id) references type_attack(id),
-    FOREIGN KEY (pre_video_id) references video(id),
-    FOREIGN KEY (solution_video_id) references video(id)
-
+	FOREIGN KEY (type_attack_id) references type_attack(id)
 );
 
 CREATE TABLE user_attack(
@@ -77,10 +72,11 @@ CREATE TABLE video (
     title VARCHAR(255) NOT NULL,
     difficulty VARCHAR(50) NOT NULL,
     video_file VARCHAR(255) UNIQUE,
+    type ENUM('PRE', 'SOLUTION') NOT NULL,
     attack_id INT,
     type_attack_id INT,
-    FOREIGN KEY(attack_id) references attack(id),
-    FOREIGN KEY(type_attack_id) references type_attack(id)
+    FOREIGN KEY(type_attack_id) references type_attack(id),
+    FOREIGN KEY(attack_id) references attack(id)
     );
 
 CREATE TABLE user_video(
@@ -104,11 +100,11 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 
 
 -- Introducimos ataques
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, pre_video_id, solution_video_id) VALUES
-(1, 'The first sql attack', 'Easy', 1, 1, 1),
-(2, 'The second sql attack', 'Medium', 1, 1, null),
-(3, 'The third sql attack', 'Hard', 1, null, null),
-(4, 'The final sql attack', 'Medium', 1, null, null);
+INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id) VALUES
+(1, 'The first sql attack', 'Easy', 1),
+(2, 'The second sql attack', 'Medium', 1),
+(3, 'The third sql attack', 'Hard', 1),
+(4, 'The final sql attack', 'Medium', 1);
 
 
 -- Introducimos usuarios
@@ -140,4 +136,3 @@ INSERT INTO hackweb.video (title, difficulty, video_file, attack_id, type_attack
 -- Introducimos user_video
 INSERT into user_video (user_id, video_id, saved, completed) VALUES
 (1,1,1,0);
-

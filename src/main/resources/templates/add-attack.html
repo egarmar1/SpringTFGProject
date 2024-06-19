@@ -76,7 +76,7 @@
             <label class="mt-2 heading_font font_sub_heading_color">Pre Video</label>
             <div class="row">
                 <div class="col-md-4 form-group">
-                    <input th:field="*{preVideo.title}" id="preTitle" type="text" class="form-control"
+                    <input th:field="*{videos[0].title}" id="preTitle" type="text" class="form-control"
                            placeholder="Título">
                 </div>
                 <!--                <div class="col-md-4 form-group">-->
@@ -94,14 +94,13 @@
                             accept="video/mp4, video/avi, video/mkv"
                     />
                 </div>
-                <input type="text" name="preVideoFile" th:field="*{preVideo.videoFile}" class="form-control"
-                       hidden/>
+
             </div>
             <label class="mt-2 heading_font font_sub_heading_color">Solution Video</label>
 
             <div class="row">
                 <div class="col-md-4 form-group">
-                    <input th:field="*{solutionVideo.title}" id="solutionTitle" type="text" class="form-control"
+                    <input th:field="*{videos[1].title}" id="solutionTitle" type="text" class="form-control"
                            placeholder="Título">
                 </div>
                 <div class="col-md-4 form-group">
@@ -112,8 +111,7 @@
                             accept="video/mp4, video/avi, video/mkv"
                     />
                 </div>
-                <input type="text" name="solutionVideoFile" th:field="*{solutionVideo.videoFile}" class="form-control"
-                       hidden/>
+
             </div>
 
             <div class="row mt-4">
