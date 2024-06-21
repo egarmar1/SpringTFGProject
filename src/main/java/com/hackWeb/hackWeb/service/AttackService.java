@@ -47,8 +47,7 @@ public class AttackService {
         boolean isSaved = ia.getIsSaved() != null && ia.getIsSaved() == 1;
         boolean isCompleted = ia.getIsCompleted() != null && ia.getIsCompleted() == 1;
 
-        return new AttackDto(ia.getTotalStudentsCompleted(), ia.getId(), ia.getTitle(), ia.getDifficulty(), typeAttack, isSaved, isCompleted,ia.getDescription(), ia.getPostedDate(),ia.getPreVideoFile(), ia.getSolutionVideoFile(),ia.getLaboratoryUrl());
-
+        return new AttackDto(ia.getTotalStudentsCompleted(), ia.getId(), ia.getTitle(), ia.getDifficulty(), typeAttack, isSaved, isCompleted,ia.getDescription(), ia.getPostedDate(),ia.getPreVideoFile(), ia.getSolutionVideoFile(),ia.getLaboratoryUrl(), ia.getQuestion(), ia.getAnswer());
     }
 
     public AttackDto getOneByAttackIdAndUserId(int attackId, int userId) {

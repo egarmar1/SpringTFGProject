@@ -49,7 +49,7 @@ public interface AttackRepository extends JpaRepository<Attack, Integer> {
 //            "ON a.type_attack_id = ta.id " +
 //            "WHERE a.id = :attackId  " +
 //            "GROUP BY a.id", nativeQuery = true)
-    @Query(value = "SELECT a.id, COUNT(ua.user_id) AS total_students_completed, a.title, a.difficulty, a.posted_date, a.description, a.laboratory_url, pre_video.video_file AS pre_video_file, solution_video.video_file AS solution_video_file, ta.id AS type_attack_id, ta.name AS type_attack_name, " +
+    @Query(value = "SELECT a.id, COUNT(ua.user_id) AS total_students_completed, a.title, a.difficulty, a.posted_date, a.description, a.laboratory_url, a.question, a.answer, pre_video.video_file AS pre_video_file, solution_video.video_file AS solution_video_file, ta.id AS type_attack_id, ta.name AS type_attack_name, " +
             "MAX(CASE WHEN ua.user_id = :userId THEN ua.saved ELSE 0 END) AS is_saved, " +
             "MAX(CASE WHEN ua.user_id = :userId THEN ua.completed ELSE 0 END) AS is_completed " +
             "FROM attack a LEFT JOIN user_attack ua ON a.id = ua.attack_id " +

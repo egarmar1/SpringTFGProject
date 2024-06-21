@@ -54,6 +54,8 @@ CREATE TABLE attack (
     description VARCHAR(10000),
     posted_date DATE,
     laboratory_url VARCHAR(255),
+    question VARCHAR(255),
+    answer VARCHAR(255),
 	FOREIGN KEY (type_attack_id) references type_attack(id)
 );
 
@@ -100,11 +102,11 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 
 
 -- Introducimos ataques
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id) VALUES
-(1, 'The first sql attack', 'Easy', 1),
-(2, 'The second sql attack', 'Medium', 1),
-(3, 'The third sql attack', 'Hard', 1),
-(4, 'The final sql attack', 'Medium', 1);
+INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, laboratory_url, question, answer) VALUES
+(1, 'The first sql attack', 'Easy', 1, 'http://localhost:8081/','Introduce the flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073'),
+(2, 'The second sql attack', 'Medium', 1, 'http://localhost:8081/', 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b'),
+(3, 'The third sql attack', 'Hard', 1, 'http://localhost:8081/', 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8'),
+(4, 'The final sql attack', 'Medium', 1, 'http://localhost:8081/', 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5');
 
 
 -- Introducimos usuarios
@@ -130,8 +132,8 @@ INSERT INTO hackweb.user_attack (user_id, attack_id, saved, completed) VALUES
 (4, 2, 1, 0);
 
 -- Introducimos videos
-INSERT INTO hackweb.video (title, difficulty, video_file, attack_id, type_attack_id) VALUES
-("The first SQL video file", "Easy", "video.mp4", 1, 1);
+INSERT INTO hackweb.video (title, difficulty, video_file, type, attack_id, type_attack_id) VALUES
+("The first SQL video file", "Easy", "video.mp4", 'SOLUTION', 1, 1);
 
 -- Introducimos user_video
 INSERT into user_video (user_id, video_id, saved, completed) VALUES

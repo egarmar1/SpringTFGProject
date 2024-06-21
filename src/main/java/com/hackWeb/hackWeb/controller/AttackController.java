@@ -97,7 +97,10 @@ public class AttackController {
     }
 
     @PostMapping("/attack-details/complete/{id}")
-    public ResponseEntity<Map<String,String>> completeAttack(@PathVariable("id") int attackId, Model model) {
+    public ResponseEntity<Map<String,String>> completeAttack(@PathVariable("id") int attackId,
+                                                             @RequestParam("answer") String answer,
+                                                             Model model) {
+
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -105,9 +108,20 @@ public class AttackController {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
 
 
+
             String username = authentication.getName();
             User user = userService.getCurrentUser();
+            model.addAttribute("user", user.getUserProfile());
+
+
             Attack attack = attackService.getOneById(attackId);
+            Map<String,String> response = new HashMap<>();
+
+            if(!answer.equals(attack.getAnswer())){
+                response.put("status", "incorrect");
+                response.put("message", "La respuesta es incorrecta.");
+                return ResponseEntity.ok(response);
+            }
 
             Integer solutionVideoId = attack.getVideos().stream()
                     .filter(video -> video.getType() == VideoType.SOLUTION)
@@ -116,11 +130,10 @@ public class AttackController {
 
 
             userAttackService.setComplete(attackId, user, true);
-            model.addAttribute("user", user.getUserProfile());
             model.addAttribute("showModal", true); // Agregar atributo para mostrar el modal
 
-            Map<String,String> response = new HashMap<>();
 
+            response.put("status","correct");
             response.put("solutionVideoId",solutionVideoId.toString());
             return ResponseEntity.ok(response);
         }

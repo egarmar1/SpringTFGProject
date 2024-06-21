@@ -34,8 +34,9 @@ public class Attack {
 
     private String laboratoryUrl;
 
+    private String question;
 
-
+    private String answer;
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "attack")
     private List<UserAttack> userAttacks;
@@ -49,7 +50,7 @@ public class Attack {
         this.title = title;
     }
 
-    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String laboratoryUrl, List<UserAttack> userAttacks) {
+    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String laboratoryUrl, String question, String answer, List<UserAttack> userAttacks) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
@@ -58,6 +59,8 @@ public class Attack {
         this.typeAttack = typeAttack;
         this.videos = videos;
         this.laboratoryUrl = laboratoryUrl;
+        this.question = question;
+        this.answer = answer;
         this.userAttacks = userAttacks;
     }
 
@@ -144,5 +147,21 @@ public class Attack {
 
     public void setVideos(List<Video> videos) {
         this.videos = videos;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
     }
 }
