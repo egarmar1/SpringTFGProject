@@ -2,11 +2,14 @@ package com.hackWeb.hackWeb.controller;
 
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
+import com.hackWeb.hackWeb.exception.ApiRequestException;
 import com.hackWeb.hackWeb.service.AttackService;
 import com.hackWeb.hackWeb.service.TypeAttackService;
 import com.hackWeb.hackWeb.service.UserAttackService;
 import com.hackWeb.hackWeb.service.UserService;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,9 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 public class AttackController {
@@ -44,6 +45,7 @@ public class AttackController {
     public String attackDetails(@PathVariable("id") int attackId, Model model) {
 
 
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -59,7 +61,6 @@ public class AttackController {
             model.addAttribute("attackDetails", attackDto);
 
         }
-
         return "attack-details";
     }
 
@@ -96,20 +97,35 @@ public class AttackController {
     }
 
     @PostMapping("/attack-details/complete/{id}")
-    public String completeAttack(@PathVariable("id") int attackId, Model model) {
+    public ResponseEntity<Map<String,String>> completeAttack(@PathVariable("id") int attackId, Model model) {
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
+
+
             String username = authentication.getName();
             User user = userService.getCurrentUser();
+            Attack attack = attackService.getOneById(attackId);
+
+            Integer solutionVideoId = attack.getVideos().stream()
+                    .filter(video -> video.getType() == VideoType.SOLUTION)
+                    .map(Video::getId)
+                    .findFirst().orElseThrow(() -> new RuntimeException("There is no solution video"));
+
 
             userAttackService.setComplete(attackId, user, true);
             model.addAttribute("user", user.getUserProfile());
             model.addAttribute("showModal", true); // Agregar atributo para mostrar el modal
+
+            Map<String,String> response = new HashMap<>();
+
+            response.put("solutionVideoId",solutionVideoId.toString());
+            return ResponseEntity.ok(response);
         }
 
-        return "redirect:/video/watch";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 
@@ -148,52 +164,50 @@ public class AttackController {
                                    @RequestParam("preVideoFile") MultipartFile preVideoFile,
                                    @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile) {
 
-            Video preVideo = attack.getVideos().stream()
-                    .filter( video -> video.getType() == VideoType.PRE).findFirst().orElse(new Video(attack, VideoType.PRE));
 
-            Video solutionVideo = attack.getVideos().stream()
-                    .filter( video -> video.getType() == VideoType.SOLUTION).findFirst().orElse(new Video(attack, VideoType.SOLUTION));
+            List<Video> videosToSave = new ArrayList<>();
 
-
-
-
-            preVideo.setDifficulty(attack.getDifficulty());
-            solutionVideo.setDifficulty(attack.getDifficulty());
-
-            String preFileName = "";
-            String solutionFileName = "";
-            if(!Objects.equals(preVideoFile.getOriginalFilename(), "")){
-                preFileName = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-                preVideo.setVideoFile(preFileName);
+            if(preVideoFile != null && !preVideoFile.isEmpty()){
+                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                Video preVideo = new Video(attack, VideoType.PRE);
+                preVideo.setDifficulty(attack.getDifficulty());
+                preVideo.setTitle(attack.getVideos().get(0).getTitle());
+                preVideo.setTypeAttack(attack.getTypeAttack());
+                preVideo.setVideoFile(preFilename);
+                videosToSave.add(preVideo);
             }
 
-            if(!Objects.equals(solutionVideoFile.getOriginalFilename(), "")){
-                solutionFileName = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-                solutionVideo.setVideoFile(solutionFileName);
+            if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
+                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                Video solutionVideo = new Video(attack, VideoType.SOLUTION);
+                solutionVideo.setDifficulty(attack.getDifficulty());
+                solutionVideo.setTitle(attack.getVideos().get(1).getTitle());
+                solutionVideo.setTypeAttack(attack.getTypeAttack());
+                solutionVideo.setVideoFile(solutionFilename);
+                videosToSave.add(solutionVideo);
             }
 
+
+            attack.setVideos(videosToSave);
             attack.setPosted_date(new Date());
-
-
-            System.out.println("El attack es: " + attack);
-            System.out.println("El preVideo es: " + preVideo.getAttack());
-            System.out.println("El solutionVideo es: " + solutionVideo);
-
-
             attackService.save(attack);
 
             String uploadDir = "videos/attack/" + attack.getId();
 
             try{
-                FileUploadUtil.saveFile(uploadDir,preFileName,preVideoFile);
-                FileUploadUtil.saveFile(uploadDir,solutionFileName,solutionVideoFile);
+                if(preVideoFile != null && !preVideoFile.isEmpty()) {
+                    String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
+                }
+                if(solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+                    String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+                }
             }catch (Exception exc){
                 exc.printStackTrace();
             }
 
 
-            return "dashboard";
+            return "redirect:/dashboard/?attackSaved=true";
         }
-
-
 }

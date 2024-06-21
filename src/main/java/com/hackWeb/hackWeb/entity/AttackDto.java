@@ -23,8 +23,9 @@ public class AttackDto {
 
     private String preVideoFile;
     private String solutionVideoFile;
+    private String laboratoryUrl;
 
-    public AttackDto(Long totalStudentsCompleted, Integer id, String title, String difficulty, TypeAttack typeAttack, boolean saved, boolean completed, String description, Date postedDate, String preVideoFile, String solutionVideoFile) {
+    public AttackDto(Long totalStudentsCompleted, Integer id, String title, String difficulty, TypeAttack typeAttack, boolean saved, boolean completed, String description, Date postedDate, String preVideoFile, String solutionVideoFile, String laboratoryUrl) {
         this.totalStudentsCompleted = totalStudentsCompleted;
         this.id = id;
         this.title = title;
@@ -36,6 +37,7 @@ public class AttackDto {
         this.postedDate = postedDate;
         this.preVideoFile = preVideoFile;
         this.solutionVideoFile = solutionVideoFile;
+        this.laboratoryUrl = laboratoryUrl;
     }
 
 
@@ -140,5 +142,13 @@ public class AttackDto {
 
     public void setSolutionVideoFile(String solutionVideoFile) {
         this.solutionVideoFile = solutionVideoFile;
+    }
+
+    public String getLaboratoryUrl() {
+        return laboratoryUrl;
+    }
+
+    public void setLaboratoryUrl(String laboratoryUrl) {
+        this.laboratoryUrl = laboratoryUrl;
     }
 }
