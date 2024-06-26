@@ -6,10 +6,7 @@ import com.hackWeb.hackWeb.service.UserService;
 import com.hackWeb.hackWeb.service.UserVideoService;
 import com.hackWeb.hackWeb.service.VideoService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +39,7 @@ private final UserVideoService userVideoService;
 
         model.addAttribute("user", user.getUserProfile());
 
-        VideoDto videoDetails = videoService.getOneByVideoIdAndUserId(videoId, user.getId());
+        VideoDto videoDetails = userVideoService.getOne(videoId, user.getId());
 
         System.out.println("The video details are: " + videoDetails);
         model.addAttribute("videoDetails" , videoDetails);

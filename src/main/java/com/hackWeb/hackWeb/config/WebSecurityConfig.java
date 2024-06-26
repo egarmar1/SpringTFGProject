@@ -44,11 +44,11 @@ public class WebSecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.authenticationProvider(DaoAuthenticationProvider());
 
-        http.authorizeHttpRequests( auth -> {
-            auth.requestMatchers(publicUrl).permitAll();
-            auth.requestMatchers("/attack/add","/attack/addNew").hasAuthority("Admin");
-            auth.anyRequest().authenticated();
-        });
+            http.authorizeHttpRequests( auth -> {
+                auth.requestMatchers(publicUrl).permitAll();
+                auth.requestMatchers("/attack/add","/attack/addNew").hasAuthority("Admin");
+                auth.anyRequest().authenticated();
+            });
 
 
         http.formLogin(form -> form.loginPage("/login").permitAll().successHandler(customAuthenticationSuccessHandler))

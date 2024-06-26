@@ -19,11 +19,7 @@ public class VideoService {
         this.attackRepository = attackRepository;
     }
 
-    public VideoDto getOneByVideoIdAndUserId(int videoId, int userId){
-        IVideo iVideo = videoRepository.getOneByVideoIdAndUserId(videoId,userId);
 
-        return  convertToVideoDto(iVideo);
-    }
 
     public List<VideoDto> getAllByUserId(int userId){
         List<IVideo> iVideos = videoRepository.getAllByUserId(userId);

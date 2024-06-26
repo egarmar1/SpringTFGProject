@@ -45,7 +45,6 @@
         </div>
 
         <div class="box mt-3">
-            <label class="large-label px-3 mt-3"> Detalles del ataque </label>
 
             <div class="box mt-3">
                 <label class="large-label px-3 mt-3"> Detalles del ataque </label>
@@ -114,7 +113,7 @@
                     </div>
                     <div class="col-md-3" >
                         <form id="completeForm" th:if="${attackDetails.completed == false}" th:action="@{/attack-details/complete/{id}(id=${attackDetails.id})}" method="post">
-                            <label for="completionInput" th:text="${attackDetails.question}">¿Por qué completaste este ataque?</label>
+                            <label for="completionInput" th:text="${attackDetails.question}">Introduce la flag</label>
                             <input type="text" id="completionInput" name="answer" class="form-control mb-2" placeholder="Respuesta">
                             <button class="btn-sec btn-black w-100" type="button" onclick="showCompletionModal()">Comprobar respuesta</button>
                         </form>

@@ -3,10 +3,7 @@ package com.hackWeb.hackWeb.controller;
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.exception.ApiRequestException;
-import com.hackWeb.hackWeb.service.AttackService;
-import com.hackWeb.hackWeb.service.TypeAttackService;
-import com.hackWeb.hackWeb.service.UserAttackService;
-import com.hackWeb.hackWeb.service.UserService;
+import com.hackWeb.hackWeb.service.*;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +30,14 @@ public class AttackController {
     private final UserAttackService userAttackService;
     private final TypeAttackService typeAttackService;
 
-    public AttackController(AttackService attackService, UserService userService, UserAttackService userAttackService, TypeAttackService typeAttackService) {
+    private final UserVideoService userVideoService;
+
+    public AttackController(AttackService attackService, UserService userService, UserAttackService userAttackService, TypeAttackService typeAttackService, UserVideoService userVideoService) {
         this.attackService = attackService;
         this.userService = userService;
         this.userAttackService = userAttackService;
         this.typeAttackService = typeAttackService;
+        this.userVideoService = userVideoService;
     }
 
 

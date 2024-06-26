@@ -26,7 +26,13 @@ public class UserVideo {
         this.completed = false;
         this.userVideoId = new UserVideoId();
     }
-
+    public UserVideo(Video video, User user, boolean saved, boolean completed) {
+        this.video = video;
+        this.user = user;
+        this.saved = saved;
+        this.completed = completed;
+        this.userVideoId = new UserVideoId();
+    }
     public UserVideo(UserVideoId userVideoId, Video video, User user, boolean saved, boolean completed) {
         this.userVideoId = userVideoId;
         this.video = video;
