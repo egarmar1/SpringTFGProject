@@ -34,3 +34,4 @@ build/
 
 
 src/main/resources/application.properties
+src/main/java/com/hackWeb/hackWeb/config/MailConfig.java

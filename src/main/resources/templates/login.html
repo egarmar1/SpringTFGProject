@@ -39,6 +39,12 @@
         </div>
       </div>
       <div class="col-md-6">
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+          <span th:text =${error}></span>
+        </div>
+        <div th:if="${message}" class="alert alert-success" role="alert">
+          <span th:text =${message}></span>
+        </div>
         <div class="myForm" style="align-items:center">
           <form th:action="@{/login}" th:object="${user}" method="post">
             <h1 class="text-center bold font-weight-bold mb-4">Login</h1>
@@ -82,7 +88,16 @@
                 Register Now</a
               >
             </p>
+            <hr>
 
+            <p class="text-center">
+              Or login with:
+            </p>
+            <div class="form-group text-center">
+              <a class="btn btn-dark" th:href="@{/oauth2/authorization/github}" role="button">
+                <i class="fa fa-github"></i> GitHub
+              </a>
+            </div>
 
           </form>
         </div>

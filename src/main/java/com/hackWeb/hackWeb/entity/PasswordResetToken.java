@@ -9,13 +9,13 @@ import java.util.Date;
 @Table(name = "password_reset_token")
 public class PasswordResetToken {
 
-    private static final int EXPIRATION = 60 * 24; // 24 horas
+    private static final int EXPIRATION = 60 * 24; // 1 hora
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     private String token;

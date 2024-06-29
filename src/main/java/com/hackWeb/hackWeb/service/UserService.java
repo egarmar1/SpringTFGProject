@@ -26,12 +26,14 @@ public class UserService {
     private final UserTypeRepository userTypeRepository;
     private final UserProfileRepository userProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenService passwordResetTokenService;
 
-    public UserService(UserRepository userRepository, UserTypeRepository userTypeRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserTypeRepository userTypeRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder, PasswordResetTokenService passwordResetTokenService) {
         this.userRepository = userRepository;
         this.userTypeRepository = userTypeRepository;
         this.userProfileRepository = userProfileRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passwordResetTokenService = passwordResetTokenService;
     }
 
     public Optional<User> findByEmail(String email){
@@ -66,5 +68,14 @@ public class UserService {
             return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Could not found the user: " + username));
         }
         return null;
+    }
+
+    @Transactional
+    public void changePasswordAndDeleteToken(User user, String password, String token) {
+        String encodedPassword = passwordEncoder.encode(password);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        passwordResetTokenService.deleteToken(token);
     }
 }

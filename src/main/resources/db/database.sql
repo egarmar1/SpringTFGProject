@@ -34,9 +34,8 @@ CREATE TABLE password_reset_token(
     id INT PRIMARY KEY AUTO_INCREMENT,
     token VARCHAR(255),
     user_id INT,
-    date DATE,
+    expiry_date DATE,
     FOREIGN KEY (user_id) REFERENCES user(id)
-
 );
 
 CREATE TABLE user_profile (
