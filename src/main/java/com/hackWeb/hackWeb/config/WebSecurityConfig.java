@@ -24,7 +24,7 @@ public class WebSecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final String[] publicUrl = {"/",
             "/reset-password**",
@@ -43,10 +43,11 @@ public class WebSecurityConfig {
             "/*.js.map",
             "/fonts**", "/favicon.ico", "/resources/**", "/error"};
 
-    public WebSecurityConfig(CustomUserDetailsService customUserDetailsService, CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler, JwtAuthenticationFilter jwtAuthenticationFilter, CustomOAuth2UserService customOAuth2UserService) {
+    public WebSecurityConfig(CustomUserDetailsService customUserDetailsService, CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler, JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthenticationFailureHandler customAuthenticationFailureHandler, CustomOAuth2UserService customOAuth2UserService) {
         this.customUserDetailsService = customUserDetailsService;
         this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
         this.customOAuth2UserService = customOAuth2UserService;
     }
 
@@ -63,8 +64,16 @@ public class WebSecurityConfig {
         });
 
 
-        http.formLogin(form -> form.loginPage("/login").permitAll().successHandler(customAuthenticationSuccessHandler))
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).deleteCookies("JSESSIONID"))
+        http
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler))
+                .logout(logout -> logout.logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // Cambiado de STATELESS a IF_REQUIRED
@@ -76,8 +85,7 @@ public class WebSecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)));
 
-        DefaultSecurityFilterChain build = http.build();
-        return build;
+        return http.build();
     }
 
 

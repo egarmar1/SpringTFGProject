@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.util.List;
 
@@ -25,7 +27,12 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(@RequestParam(value = "error", required = false) String error, Model model) {
+        if(error != null){
+            model.addAttribute("error", model.addAttribute(error));
+        }
+        System.out.println("Vamos con el error" + error);
+
         return "login";
     }
 

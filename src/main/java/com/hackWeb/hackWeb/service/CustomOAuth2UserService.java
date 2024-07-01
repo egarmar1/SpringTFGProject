@@ -1,6 +1,8 @@
 package com.hackWeb.hackWeb.service;
 
 import com.hackWeb.hackWeb.entity.User;
+import com.hackWeb.hackWeb.exception.MyException;
+import com.hackWeb.hackWeb.exception.OAuth2UserNotFoundException;
 import com.hackWeb.hackWeb.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,7 +50,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         System.out.println("El email recogido de github es: " + email);
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found from github"));
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getUserType().getName()));
 
