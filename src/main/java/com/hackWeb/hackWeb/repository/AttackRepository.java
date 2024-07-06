@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface AttackRepository extends JpaRepository<Attack, Integer> {
 
+    Attack findByDockerImageName(String dockerImageName);
     @Query(value = "SELECT a.* FROM attack a " +
             "INNER JOIN type_attack t ON a.type_attack_id=t.id " +
             "WHERE a.difficulty IN(:difficulties) " +

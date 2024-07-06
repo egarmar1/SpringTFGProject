@@ -64,6 +64,7 @@ CREATE TABLE attack (
     laboratory_url VARCHAR(255),
     question VARCHAR(255),
     answer VARCHAR(255),
+    docker_image_name VARCHAR(50),
 	FOREIGN KEY (type_attack_id) references type_attack(id)
 );
 
@@ -98,6 +99,22 @@ CREATE TABLE user_video(
     FOREIGN KEY(user_id) references user(id),
     FOREIGN KEY(video_id) references video(id)
 );
+
+
+CREATE TABLE container_info(
+	id INT NOT NULL AUTO_INCREMENT,
+    container_id VARCHAR(255) NOT NULL,
+    web_sockify_port INT ,
+    container_port INT  NOT NULL,
+    user_id INT,
+    attack_id INT,
+
+    PRIMARY KEY(id),
+    FOREIGN KEY(user_id) references user(id),
+    FOREIGN KEY(attack_id) references attack(id)
+);
+
+
 -- Introducimos roles
 INSERT INTO user_type (name) VALUES ("Admin");
 INSERT INTO user_type (name) VALUES ("Student");

@@ -38,6 +38,7 @@ public class Attack {
 
     private String answer;
 
+    private String dockerImageName;
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "attack")
     private List<UserAttack> userAttacks;
 
@@ -50,7 +51,7 @@ public class Attack {
         this.title = title;
     }
 
-    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String laboratoryUrl, String question, String answer, List<UserAttack> userAttacks) {
+    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String laboratoryUrl, String question, String answer, List<UserAttack> userAttacks, String dockerImageName) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
@@ -62,6 +63,7 @@ public class Attack {
         this.question = question;
         this.answer = answer;
         this.userAttacks = userAttacks;
+        this.dockerImageName = dockerImageName;
     }
 
     public int getId() {
@@ -163,5 +165,13 @@ public class Attack {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public String getDockerImageName() {
+        return dockerImageName;
+    }
+
+    public void setDockerImageName(String dockerImageName) {
+        this.dockerImageName = dockerImageName;
     }
 }
