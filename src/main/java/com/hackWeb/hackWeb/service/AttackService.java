@@ -37,7 +37,7 @@ public class AttackService {
 
         List<IAttack> iAttacks = attackRepository.searchDto(difficulties,typeAttacks,attackTitle, userId);
 
-        System.out.println("The iAttacks are: " + iAttacks);
+        
         return  iAttacks.stream()
                 .map(this::convertToAttackDto)
                 .collect(Collectors.toList());
@@ -48,7 +48,22 @@ public class AttackService {
         boolean isSaved = ia.getIsSaved() != null && ia.getIsSaved() == 1;
         boolean isCompleted = ia.getIsCompleted() != null && ia.getIsCompleted() == 1;
 
-        return new AttackDto(ia.getTotalStudentsCompleted(), ia.getId(), ia.getTitle(), ia.getDifficulty(), typeAttack, isSaved, isCompleted,ia.getDescription(), ia.getPostedDate(),ia.getPreVideoFile(), ia.getSolutionVideoFile(),ia.getLaboratoryUrl(), ia.getQuestion(), ia.getAnswer());
+        return new AttackDto(
+                ia.getTotalStudentsCompleted(),
+                ia.getId(),
+                ia.getTitle(),
+                ia.getDifficulty(),
+                typeAttack,
+                isSaved,
+                isCompleted,
+                ia.getDescription(),
+                ia.getPostedDate(),
+                ia.getPreVideoFile(),
+                ia.getSolutionVideoFile(),
+                ia.getLaboratoryUrl(),
+                ia.getQuestion(),
+                ia.getAnswer(),
+                ia.getDockerImageName());
     }
 
     public AttackDto getOneByAttackIdAndUserId(int attackId, int userId) {

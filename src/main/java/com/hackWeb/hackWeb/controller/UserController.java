@@ -31,7 +31,7 @@ public class UserController {
         if(error != null){
             model.addAttribute("error", model.addAttribute(error));
         }
-        System.out.println("Vamos con el error" + error);
+
 
         return "login";
     }

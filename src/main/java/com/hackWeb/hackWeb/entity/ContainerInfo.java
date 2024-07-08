@@ -2,10 +2,15 @@ package com.hackWeb.hackWeb.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
+
 @Entity
 @Table(name = "container_info")
 public class ContainerInfo {
 
+    private static final int EXPIRATION = 1; // minutos
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -22,7 +27,10 @@ public class ContainerInfo {
     @JoinColumn(name = "attack_id")
     private Attack attack;
 
+    private LocalDateTime expiryDate;
+
     public ContainerInfo() {
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     public ContainerInfo(int id, String containerId, Integer webSockifyPort, int containerPort, User user, Attack attack) {
@@ -32,6 +40,7 @@ public class ContainerInfo {
         this.containerPort = containerPort;
         this.user = user;
         this.attack = attack;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     public int getId() {
@@ -82,7 +91,13 @@ public class ContainerInfo {
     public void setAttack(Attack attack) {
         this.attack = attack;
     }
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
+    }
 
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
+    }
     @Override
     public String toString() {
         return "ContainerInfo{" +
@@ -93,5 +108,12 @@ public class ContainerInfo {
                 ", user=" + user +
                 ", attack=" + attack +
                 '}';
+    }
+
+
+
+
+    private LocalDateTime calculateExpiryDate(int expiration){
+        return LocalDateTime.now().plusMinutes(expiration);
     }
 }

@@ -39,7 +39,7 @@
 <!--                    <p th:text="${jobDetails.jobCompany.name}">Company</p>-->
                 </div>
                 <div class="mt-3">
-                    <a th:href="${attackDetails.laboratoryUrl}" class="laboratory-link" target="_blank">Visitar laboratorio</a>
+                    <a th:href="@{/docker/connect(dockerImageName=${attackDetails.dockerImageName})}" class="laboratory-link" target="_blank">Visitar laboratorio</a>
                 </div>
             </div>
         </div>

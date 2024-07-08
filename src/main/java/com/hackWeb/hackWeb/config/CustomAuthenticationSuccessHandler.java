@@ -19,8 +19,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         boolean hasStudentRole = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("Student"));
         boolean hasAdminRole = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("Admin"));
-        System.out.println("Es admin: " + hasAdminRole);
-        System.out.println("Es student: " + hasStudentRole);
+
         if (hasStudentRole || hasAdminRole) {
             response.sendRedirect("/dashboard/");
         }

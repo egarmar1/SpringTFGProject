@@ -17,8 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DockerService {
@@ -29,6 +30,7 @@ public class DockerService {
     private final AttackRepository attackRepository;
 
     private Process websockifyProcess;
+
     public DockerService(DockerClient dockerClient, ContainerInfoRepository containerInfoRepository, UserService userService, AttackRepository attackRepository) {
         this.dockerClient = dockerClient;
         this.containerInfoRepository = containerInfoRepository;
@@ -37,8 +39,8 @@ public class DockerService {
     }
 
 
-//    @Transactional
-    public String createContainer(String imageName){ // "nvc-lab:latest"
+    //    @Transactional
+    public String createContainer(String imageName) { // "nvc-lab:latest"
 
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
@@ -50,7 +52,7 @@ public class DockerService {
 
         dockerClient.startContainerCmd(container.getId()).exec();
 
-        startWebSockify(websockifyHostPort,containerHostPort);
+        startWebSockify(websockifyHostPort, containerHostPort);
 
         ContainerInfo containerInfo = new ContainerInfo();
         containerInfo.setContainerId(container.getId());
@@ -80,12 +82,6 @@ public class DockerService {
                 processBuilder.directory(workingDir);
                 websockifyProcess = processBuilder.start();
 
-                // Opcional: Capturar y mostrar la salida del proceso
-                BufferedReader reader = new BufferedReader(new InputStreamReader(websockifyProcess.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -94,6 +90,7 @@ public class DockerService {
         }).start();
 
     }
+
     public void stopWebSockify(String containerId) {
         ContainerInfo containerInfo = containerInfoRepository.findByContainerId(containerId).orElseThrow(() -> new RuntimeException("Container not found"));
 
@@ -131,27 +128,46 @@ public class DockerService {
         }
     }
 
-    public void stopAndRemoveContainer(String containerId){
+    @Transactional
+    public void stopAndRemoveContainer(String containerId) {
         dockerClient.stopContainerCmd(containerId).exec();
         dockerClient.removeContainerCmd(containerId).exec();
+        removeContainer(containerId);
     }
 
+    public void removeContainer(String containerId){
+        ContainerInfo containerInfo = containerInfoRepository.findByContainerId(containerId)
+                .orElseThrow(() -> new RuntimeException("Container not found"));
 
-    public Map<String, String> getContainerInfo(String containerId){
+        containerInfoRepository.delete(containerInfo);
+    }
+
+    public Map<String, String> getContainerInfo(String containerId) {
         var container = dockerClient.inspectContainerCmd(containerId).exec();
 
         ContainerInfo containerInfo = containerInfoRepository.findByContainerId(containerId).orElseThrow(() -> new RuntimeException("No container with id" + containerId));
 
 
-
         Map<String, String> info = new HashMap<>();
 
-        info.put("containerId" , container.getId());
+        info.put("containerId", container.getId());
         info.put("status", container.getState().getStatus());
         info.put("vncPort", containerInfo.getWebSockifyPort().toString());
 
         return info;
     }
+
+    public List<ContainerInfo> getExpiredContainers() {
+        List<ContainerInfo> containersInfo = containerInfoRepository.findAll();
+
+
+
+        return containersInfo.stream()
+                .filter(container -> container.getExpiryDate().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
+
+    }
+
 
     private int findFreePort() {
         try (ServerSocket socket = new ServerSocket(0)) {

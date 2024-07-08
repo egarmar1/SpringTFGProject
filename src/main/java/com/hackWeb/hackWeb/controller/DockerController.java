@@ -2,15 +2,14 @@ package com.hackWeb.hackWeb.controller;
 
 import com.github.dockerjava.api.DockerClient;
 import com.hackWeb.hackWeb.service.DockerService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/docker")
+@Controller
+@RequestMapping("/docker")
 public class DockerController {
 
 
@@ -21,19 +20,20 @@ public class DockerController {
     }
 
 
-    @PostMapping("/connect")
-    public String  connect(@RequestParam String imageName ){
+    @GetMapping("/connect")
+    public RedirectView connect(@RequestParam("dockerImageName") String imageName ){
         String containerId = dockerService.createContainer(imageName);
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
-        System.out.println(containerInfo);
-        return containerInfo.toString();
+        String vncPort = containerInfo.get("vncPort");
+
+        return new RedirectView("http://localhost:" + vncPort + "/vnc.html");
 
     }
 
 
-    @PostMapping("/disconnect")
-    public void disconnect(@RequestParam String containerId){
+    @GetMapping("/disconnect")
+    public void disconnect(@RequestParam("containerId") String containerId){
         dockerService.stopAndRemoveContainer(containerId);
         dockerService.stopWebSockify(containerId);
     }

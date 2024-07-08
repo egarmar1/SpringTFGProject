@@ -32,5 +32,5 @@ public interface IAttack {
     String getLaboratoryUrl();
     String getQuestion();
     String getAnswer();
-
+    String getDockerImageName();
 }
