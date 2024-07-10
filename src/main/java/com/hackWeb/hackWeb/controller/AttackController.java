@@ -5,6 +5,8 @@ import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.exception.MyException;
 import com.hackWeb.hackWeb.service.*;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
+import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -13,11 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -171,11 +172,23 @@ public class AttackController {
 
 
         @PostMapping("/attack/addNew")
-        public String addNewAttack(Attack attack,
+        public String addNewAttack(@Valid Attack attack,
+                                   BindingResult bindingResult,
                                    @RequestParam("preVideoFile") MultipartFile preVideoFile,
-                                   @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile) {
+                                   @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
+                                   Model model) {
 
 
+            if (bindingResult.hasErrors()) {
+                UserProfile userProfile = userService.getCurrentUser().getUserProfile();
+                List<TypeAttack> typeAttacks = typeAttackService.getAll();
+
+                model.addAttribute("attack", attack);
+                model.addAttribute("typeAttacks", typeAttacks);
+                model.addAttribute("user", userProfile);
+
+                return "add-attack";
+            }
             List<Video> videosToSave = new ArrayList<>();
 
             if(preVideoFile != null && !preVideoFile.isEmpty()){
@@ -201,7 +214,13 @@ public class AttackController {
 
             attack.setVideos(videosToSave);
             attack.setPosted_date(new Date());
-            attackService.save(attack);
+
+            try {
+                attackService.save(attack);
+            } catch (DataIntegrityViolationException e) {
+                model.addAttribute("error", "El docker image name ya existe");
+                return "add-attack";
+            }
 
             String uploadDir = "videos/attack/" + attack.getId();
 

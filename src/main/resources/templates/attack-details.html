@@ -66,8 +66,7 @@
                         <div class="col-md-6 text-center">
                             <h3>Explanation video</h3>
                             <video width="600" controls>
-                                <source th:src="@{/videos/{videoFile}(videoFile=${attackDetails.preVideoFile})}" type="video/mp4">
-                                <p th:text="@{/videos/{videoFile}(videoFile=${attackDetails.preVideoFile})}"></p>
+                                <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.preVideoFile}}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                         </div>

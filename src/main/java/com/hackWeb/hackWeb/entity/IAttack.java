@@ -29,7 +29,6 @@ public interface IAttack {
 
     String getPreVideoFile();
     String getSolutionVideoFile();
-    String getLaboratoryUrl();
     String getQuestion();
     String getAnswer();
     String getDockerImageName();

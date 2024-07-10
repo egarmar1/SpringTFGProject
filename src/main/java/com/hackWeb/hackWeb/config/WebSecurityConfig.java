@@ -28,6 +28,7 @@ public class WebSecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final String[] publicUrl = {"/",
             "/reset-password**",
+            "/login**",
             "/forgot-password",
             "/global-search/**",
             "/register",

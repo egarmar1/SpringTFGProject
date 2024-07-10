@@ -23,14 +23,13 @@ public class AttackDto {
 
     private String preVideoFile;
     private String solutionVideoFile;
-    private String laboratoryUrl;
 
     private String question;
     private String answer;
 
     private String dockerImageName;
 
-    public AttackDto(Long totalStudentsCompleted, Integer id, String title, String difficulty, TypeAttack typeAttack, boolean saved, boolean completed, String description, Date postedDate, String preVideoFile, String solutionVideoFile, String laboratoryUrl, String question, String answer, String dockerImageName) {
+    public AttackDto(Long totalStudentsCompleted, Integer id, String title, String difficulty, TypeAttack typeAttack, boolean saved, boolean completed, String description, Date postedDate, String preVideoFile, String solutionVideoFile, String question, String answer, String dockerImageName) {
         this.totalStudentsCompleted = totalStudentsCompleted;
         this.id = id;
         this.title = title;
@@ -42,7 +41,6 @@ public class AttackDto {
         this.postedDate = postedDate;
         this.preVideoFile = preVideoFile;
         this.solutionVideoFile = solutionVideoFile;
-        this.laboratoryUrl = laboratoryUrl;
         this.question = question;
         this.answer = answer;
         this.dockerImageName = dockerImageName;
@@ -151,13 +149,7 @@ public class AttackDto {
         this.solutionVideoFile = solutionVideoFile;
     }
 
-    public String getLaboratoryUrl() {
-        return laboratoryUrl;
-    }
 
-    public void setLaboratoryUrl(String laboratoryUrl) {
-        this.laboratoryUrl = laboratoryUrl;
-    }
 
     public String getQuestion() {
         return question;

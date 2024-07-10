@@ -35,6 +35,8 @@
             <div class="row">
                 <div class="col-lg-12 form-group">
                     <input id="title" type="text" th:field="*{title}" class="form-control" placeholder="Título ataque">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></div>
+
                 </div>
             </div>
 
@@ -47,6 +49,8 @@
                                 th:text="${typeAttack.name}">
                         </option>
                     </select>
+                    <div th:if="${#fields.hasErrors('typeAttack')}" th:errors="*{typeAttack}" class="text-danger"></div>
+
                 </div>
                 <div class="col-md-4 form-group">
                     <select id="remote" th:field="*{difficulty}" class="form-control">
@@ -55,10 +59,14 @@
                         <option th:value="Medium">Medium</option>
                         <option th:value="Hard">Hard</option>
                     </select>
+                    <div th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}" class="text-danger"></div>
+
                 </div>
                 <div class="col-md-4 form-group">
                     <input id="docker_image_name" th:field="*{dockerImageName}" type="text" class="form-control"
                            placeholder="Name of the docker image">
+                    <div th:if="${#fields.hasErrors('dockerImageName')}" th:errors="*{dockerImageName}" class="text-danger"></div>
+
                 </div>
             </div>
             <div class="row">
@@ -66,6 +74,8 @@
                     <label class="mt-2 heading_font font_sub_heading_color">Descripción</label>
                     <textarea type="text" rows="4" id="content" placeholder="Content" class="form-control"
                               th:field="*{description}" autocomplete="off"></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></div>
+
                 </div>
             </div>
 
@@ -74,6 +84,8 @@
                 <div class="col-md-4 form-group">
                     <input th:field="*{videos[0].title}" id="preTitle" type="text" class="form-control"
                            placeholder="Título">
+                    <div th:if="${#fields.hasErrors('videos[0].title')}" th:errors="*{videos[0].title}" class="text-danger"></div>
+
                 </div>
                 <div class="col-md-4 form-group">
                     <input
@@ -90,6 +102,7 @@
                 <div class="col-md-4 form-group">
                     <input th:field="*{videos[1].title}" id="solutionTitle" type="text" class="form-control"
                            placeholder="Título">
+                    <div th:if="${#fields.hasErrors('videos[1].title')}" th:errors="*{videos[1].title}" class="text-danger"></div>
                 </div>
                 <div class="col-md-4 form-group">
                     <input
@@ -105,6 +118,7 @@
             <div class="row">
                 <div class="col-md-12 form-group">
                     <input id="question" type="text" th:field="*{question}" class="form-control" placeholder="Pregunta">
+                    <div th:if="${#fields.hasErrors('question')}" th:errors="*{question}" class="text-danger"></div>
                 </div>
             </div>
 
@@ -112,14 +126,18 @@
             <div class="row">
                 <div class="col-md-12 form-group">
                     <input id="answer" type="text" th:field="*{answer}" class="form-control" placeholder="Respuesta">
+                    <div th:if="${#fields.hasErrors('answer')}" th:errors="*{answer}" class="text-danger"></div>
+
                 </div>
             </div>
+            <div th:if="${error}" th:text="${error}" class="text-danger"></div>
 
             <div class="row mt-4">
                 <div class="col d-flex justify-content-center">
                     <button type="submit" name="submit" class="btn btn-primary base_button px-4 py-2 mb-5">Save</button>
                 </div>
             </div>
+
         </form>
     </div>
 </div>

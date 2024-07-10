@@ -60,7 +60,6 @@ public class AttackService {
                 ia.getPostedDate(),
                 ia.getPreVideoFile(),
                 ia.getSolutionVideoFile(),
-                ia.getLaboratoryUrl(),
                 ia.getQuestion(),
                 ia.getAnswer(),
                 ia.getDockerImageName());

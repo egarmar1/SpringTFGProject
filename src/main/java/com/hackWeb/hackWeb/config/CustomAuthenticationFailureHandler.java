@@ -15,9 +15,8 @@ import java.nio.charset.StandardCharsets;
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String errorMessage = URLEncoder.encode("Credenciales incorrectas", StandardCharsets.UTF_8);
-        System.out.println("Pasaremos el error message "+ errorMessage);
-        response.sendRedirect("/login?error=" + errorMessage);
+
+        response.sendRedirect("/login?error=true");
 
 
     }

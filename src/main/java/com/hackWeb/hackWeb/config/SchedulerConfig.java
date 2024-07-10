@@ -21,6 +21,7 @@ public class SchedulerConfig {
     public void checkAndDisconnectExpiredContainers(){
         List<ContainerInfo> expiredContainers = dockerService.getExpiredContainers();
 
+        System.out.println("Expired Containers are: " + expiredContainers);
         expiredContainers
                 .forEach(container -> {
                     dockerService.stopWebSockify(container.getContainerId());

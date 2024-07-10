@@ -9,6 +9,7 @@ import com.github.dockerjava.api.model.Ports;
 import com.hackWeb.hackWeb.entity.ContainerInfo;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.ContainerInfoRepository;
+import com.github.dockerjava.api.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,7 @@ public class DockerService {
 
 
     //    @Transactional
-    public String createContainer(String imageName) { // "nvc-lab:latest"
+    public String createContainer(String imageName, String vncPassword) { // "nvc-lab:latest"
 
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
@@ -48,6 +49,7 @@ public class DockerService {
         CreateContainerResponse container = dockerClient.createContainerCmd(imageName)
                 .withHostConfig(HostConfig.newHostConfig()
                         .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901))))
+                .withEnv("VNC_PASSWORD=" + vncPassword)
                 .exec();
 
         dockerClient.startContainerCmd(container.getId()).exec();
@@ -120,7 +122,7 @@ public class DockerService {
 
 
             } else {
-                throw new RuntimeException("No process found using port " + webSockifyPort);
+                System.out.println("No process found using port " + webSockifyPort);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,9 +132,18 @@ public class DockerService {
 
     @Transactional
     public void stopAndRemoveContainer(String containerId) {
-        dockerClient.stopContainerCmd(containerId).exec();
-        dockerClient.removeContainerCmd(containerId).exec();
+
+        executeDockerCommand(() -> dockerClient.stopContainerCmd(containerId).exec(), containerId);
+        executeDockerCommand(() -> dockerClient.removeContainerCmd(containerId).exec(), containerId);
         removeContainer(containerId);
+    }
+
+    private void executeDockerCommand(Runnable command , String containerId) {
+        try {
+            command.run();
+        }catch (NotFoundException e){
+            System.out.println("Contenedor no encontrado: " + containerId);
+        }
     }
 
     public void removeContainer(String containerId){

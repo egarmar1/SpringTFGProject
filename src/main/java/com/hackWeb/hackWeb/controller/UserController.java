@@ -55,8 +55,6 @@ public class UserController {
         if(bindingResult.hasErrors()){
             return "register";
         }
-//        UserType userTypeStudent = userTypeService.findByUserTypeName("Student");
-//        user.setUserType(userTypeStudent);
 
         try {
             userService.addNewStudent(user);

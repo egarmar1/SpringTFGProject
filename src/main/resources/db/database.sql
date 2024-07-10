@@ -58,13 +58,12 @@ CREATE TABLE attack (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     difficulty VARCHAR(50) NOT NULL,
-    type_attack_id INT,
+    type_attack_id INT NOT NULL,
     description VARCHAR(10000),
     posted_date DATE,
-    laboratory_url VARCHAR(255),
     question VARCHAR(255),
     answer VARCHAR(255),
-    docker_image_name  VARCHAR(50) UNIQUE,
+    docker_image_name  VARCHAR(50) UNIQUE NOT NULL,
 	FOREIGN KEY (type_attack_id) references type_attack(id)
 );
 
@@ -128,14 +127,14 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 (3, 'XSS');
 
 -- Introducimos ataques
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, laboratory_url, question, answer, docker_image_name) VALUES
-(1, 'The first sql attack', 'Easy', 1, 'http://localhost:8081/','Introduce the flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 'sqli-lab'),
-(2, 'The second sql attack', 'Medium', 1, 'http://localhost:8081/', 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
-(3, 'The third sql attack', 'Hard', 1, 'http://localhost:8081/', 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
-(4, 'The final sql attack', 'Medium', 1, 'http://localhost:8081/', 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
+INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, docker_image_name) VALUES
+(1, 'The first sql attack', 'Easy', 1,'Introduce the flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 'sqli-lab'),
+(2, 'The second sql attack', 'Medium', 1, 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
+(3, 'The third sql attack', 'Hard', 1, 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
+(4, 'The final sql attack', 'Medium', 1, 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
 
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, laboratory_url, question, answer, description, docker_image_name) VALUES
-(5, 'Basic XSS attack', 'Easy', 3, 'http://localhost:8082/', 'Introduce el flag', '$2b$12$O4s8yJdV81rPQoq6xUQ9iOnz7b7RnksD58g1EmUGkO4i.CdP4S2Bi', 'Este laboratorio está diseñado para practicar un ejemplo básico del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador.', 'vnc-lab');
+INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, description, docker_image_name) VALUES
+(5, 'Basic XSS attack', 'Easy', 3, 'Introduce el flag', '$2b$12$O4s8yJdV81rPQoq6xUQ9iOnz7b7RnksD58g1EmUGkO4i.CdP4S2Bi', 'Este laboratorio está diseñado para practicar un ejemplo básico del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador.', 'vnc-lab');
 
 
 -- Introducimos usuarios
@@ -162,8 +161,8 @@ INSERT INTO hackweb.user_attack (user_id, attack_id, saved, completed) VALUES
 
 -- Introducimos videos
 INSERT INTO hackweb.video (title, difficulty, video_file, type, attack_id, type_attack_id) VALUES
-("The first SQL video file", "Easy", "videoSQLI.mp4", 'SOLUTION', 1, 1),
-("Basic XSS attack", "Easy", "basicXssAttack.mp4", 'SOLUTION', 5, 3);
+("SQLI1 pre video", "Easy", "previoSQLI1.mp4", 'PRE', 1, 1),
+("SQLI1 solution video", "Easy", "solutionSQLI1.mp4", 'SOLUTION', 1, 1);
 
 -- Introducimos user_video
 INSERT into user_video (user_id, video_id, saved, completed) VALUES

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Map;
 
 @Controller
@@ -22,13 +24,21 @@ public class DockerController {
 
     @GetMapping("/connect")
     public RedirectView connect(@RequestParam("dockerImageName") String imageName ){
-        String containerId = dockerService.createContainer(imageName);
+        String vncPassword = generatePassword();
+        String containerId = dockerService.createContainer(imageName, vncPassword);
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
         String vncPort = containerInfo.get("vncPort");
 
-        return new RedirectView("http://localhost:" + vncPort + "/vnc.html");
+        return new RedirectView("http://localhost:" + vncPort + "/vnc.html?password=" + vncPassword);
 
+    }
+
+    private String generatePassword() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[8];
+        secureRandom.nextBytes(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
 
