@@ -2,10 +2,7 @@ package com.hackWeb.hackWeb.service;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.*;
 import com.hackWeb.hackWeb.entity.ContainerInfo;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.ContainerInfoRepository;
@@ -41,23 +38,42 @@ public class DockerService {
 
 
     //    @Transactional
-    public String createContainer(String imageName, String vncPassword) { // "nvc-lab:latest"
+    public String createContainers(String imageName, String vncPassword) {
+        // Crear o verificar la red Docker
+        String networkName = "sqli-network";
+        createNetworkIfNotExists(networkName);
 
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
 
-        CreateContainerResponse container = dockerClient.createContainerCmd(imageName)
+        // Ruta absoluta al archivo init.sql
+        String initSqlPath = "G:/Mi unidad/hackWeb/docker/sqli1Init.sql";
+
+        // Crear el contenedor MySQL
+        CreateContainerResponse mysqlContainer = dockerClient.createContainerCmd("mysql:latest")
+                .withName("mysql")
+                .withEnv("MYSQL_ROOT_PASSWORD=Kike2016+")
                 .withHostConfig(HostConfig.newHostConfig()
-                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901))))
+                        .withMounts(Collections.singletonList(new Mount().withType(MountType.BIND).withSource(initSqlPath).withTarget("/docker-entrypoint-initdb.d/sqli1Init.sql")))
+                        .withNetworkMode(networkName))
+                .exec();
+
+        dockerClient.startContainerCmd(mysqlContainer.getId()).exec();
+
+        // Crear el contenedor de la aplicación Spring Boot
+        CreateContainerResponse appContainer = dockerClient.createContainerCmd(imageName)
+                .withHostConfig(HostConfig.newHostConfig()
+                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901)))
+                        .withNetworkMode(networkName))
                 .withEnv("VNC_PASSWORD=" + vncPassword)
                 .exec();
 
-        dockerClient.startContainerCmd(container.getId()).exec();
+        dockerClient.startContainerCmd(appContainer.getId()).exec();
 
         startWebSockify(websockifyHostPort, containerHostPort);
 
         ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.setContainerId(container.getId());
+        containerInfo.setContainerId(appContainer.getId());
         containerInfo.setWebSockifyPort(websockifyHostPort);
         containerInfo.setContainerPort(containerHostPort);
         containerInfo.setUser(userService.getCurrentUser());
@@ -70,8 +86,17 @@ public class DockerService {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Thread was interrupted", e);
         }
-        return container.getId();
+        return appContainer.getId();
     }
+
+    private void createNetworkIfNotExists(String networkName) {
+        boolean networkExists = dockerClient.listNetworksCmd().exec().stream()
+                .anyMatch(network -> network.getName().equals(networkName));
+        if (!networkExists) {
+            dockerClient.createNetworkCmd().withName(networkName).exec();
+        }
+    }
+
 
     private void startWebSockify(int websockifyHostPort, int containerHostPort) {
         new Thread(() -> {

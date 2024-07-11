@@ -1,6 +1,5 @@
 package com.hackWeb.hackWeb.controller;
 
-import com.github.dockerjava.api.DockerClient;
 import com.hackWeb.hackWeb.service.DockerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class DockerController {
     @GetMapping("/connect")
     public RedirectView connect(@RequestParam("dockerImageName") String imageName ){
         String vncPassword = generatePassword();
-        String containerId = dockerService.createContainer(imageName, vncPassword);
+        String containerId = dockerService.createContainers(imageName, vncPassword);
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
         String vncPort = containerInfo.get("vncPort");
