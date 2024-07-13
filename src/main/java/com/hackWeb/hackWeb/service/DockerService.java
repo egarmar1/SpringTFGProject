@@ -8,6 +8,8 @@ import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.ContainerInfoRepository;
 import com.github.dockerjava.api.exception.NotFoundException;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -17,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,7 @@ public class DockerService {
     private final AttackRepository attackRepository;
 
     private Process websockifyProcess;
+    private static final String INIT_SQL_PATH = "G:/Mi unidad/hackWeb/docker/sqli1Init.sql";
 
     public DockerService(DockerClient dockerClient, ContainerInfoRepository containerInfoRepository, UserService userService, AttackRepository attackRepository) {
         this.dockerClient = dockerClient;
@@ -39,62 +43,76 @@ public class DockerService {
 
     //    @Transactional
     public String createContainers(String imageName, String vncPassword) {
-        // Crear o verificar la red Docker
-        String networkName = "sqli-network";
-        createNetworkIfNotExists(networkName);
+
+        String networkName = createUniqueNetwork();
+        String uniqueMySQLContainerName = "mysql-" + UUID.randomUUID();
 
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
 
-        // Ruta absoluta al archivo init.sql
-        String initSqlPath = "G:/Mi unidad/hackWeb/docker/sqli1Init.sql";
 
-        // Crear el contenedor MySQL
         CreateContainerResponse mysqlContainer = dockerClient.createContainerCmd("mysql:latest")
-                .withName("mysql")
+                .withName(uniqueMySQLContainerName)
                 .withEnv("MYSQL_ROOT_PASSWORD=Kike2016+")
                 .withHostConfig(HostConfig.newHostConfig()
-                        .withMounts(Collections.singletonList(new Mount().withType(MountType.BIND).withSource(initSqlPath).withTarget("/docker-entrypoint-initdb.d/sqli1Init.sql")))
+                        .withMounts(Collections.singletonList(new Mount().withType(MountType.BIND).withSource(INIT_SQL_PATH).withTarget("/docker-entrypoint-initdb.d/sqli1Init.sql")))
                         .withNetworkMode(networkName))
                 .exec();
 
         dockerClient.startContainerCmd(mysqlContainer.getId()).exec();
-
-        // Crear el contenedor de la aplicación Spring Boot
-        CreateContainerResponse appContainer = dockerClient.createContainerCmd(imageName)
-                .withHostConfig(HostConfig.newHostConfig()
-                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901)))
-                        .withNetworkMode(networkName))
-                .withEnv("VNC_PASSWORD=" + vncPassword)
-                .exec();
-
-        dockerClient.startContainerCmd(appContainer.getId()).exec();
-
-        startWebSockify(websockifyHostPort, containerHostPort);
-
-        ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.setContainerId(appContainer.getId());
-        containerInfo.setWebSockifyPort(websockifyHostPort);
-        containerInfo.setContainerPort(containerHostPort);
-        containerInfo.setUser(userService.getCurrentUser());
-        containerInfo.setAttack(attackRepository.findByDockerImageName(imageName));
-        containerInfoRepository.save(containerInfo);
-
         try {
+            Thread.sleep(5000);
+
+            // Crear el contenedor de la aplicación Spring Boot
+            String springDatasourceUrl = "SPRING_DATASOURCE_URL=jdbc:mysql://" + uniqueMySQLContainerName + ":3306/sqliWeb";
+            CreateContainerResponse appContainer = dockerClient.createContainerCmd(imageName)
+                    .withHostConfig(HostConfig.newHostConfig()
+                            .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901)))
+                            .withNetworkMode(networkName))
+                    .withEnv("VNC_PASSWORD=" + vncPassword,
+                            springDatasourceUrl)
+                    .exec();
+
+            dockerClient.startContainerCmd(appContainer.getId()).exec();
+
+            startWebSockify(websockifyHostPort, containerHostPort);
+
+            ContainerInfo containerInfo = new ContainerInfo();
+            containerInfo.setContainerId(appContainer.getId());
+            containerInfo.setWebSockifyPort(websockifyHostPort);
+            containerInfo.setContainerPort(containerHostPort);
+            containerInfo.setUser(userService.getCurrentUser());
+            containerInfo.setAttack(attackRepository.findByDockerImageName(imageName));
+            containerInfoRepository.save(containerInfo);
+
+
             Thread.sleep(1000);
+
+            return appContainer.getId();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Thread was interrupted", e);
         }
-        return appContainer.getId();
+
     }
 
-    private void createNetworkIfNotExists(String networkName) {
-        boolean networkExists = dockerClient.listNetworksCmd().exec().stream()
+    private String createUniqueNetwork() {
+        String networkName;
+        do {
+            networkName = generateRandomString();
+        } while (networkExists(networkName));
+
+        dockerClient.createNetworkCmd().withName(networkName).exec();
+        return networkName;
+    }
+
+    private boolean networkExists(String networkName) {
+        return dockerClient.listNetworksCmd().exec().stream()
                 .anyMatch(network -> network.getName().equals(networkName));
-        if (!networkExists) {
-            dockerClient.createNetworkCmd().withName(networkName).exec();
-        }
+    }
+
+    private String generateRandomString() {
+        return RandomStringUtils.randomAlphanumeric(8);
     }
 
 
@@ -163,15 +181,15 @@ public class DockerService {
         removeContainer(containerId);
     }
 
-    private void executeDockerCommand(Runnable command , String containerId) {
+    private void executeDockerCommand(Runnable command, String containerId) {
         try {
             command.run();
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println("Contenedor no encontrado: " + containerId);
         }
     }
 
-    public void removeContainer(String containerId){
+    public void removeContainer(String containerId) {
         ContainerInfo containerInfo = containerInfoRepository.findByContainerId(containerId)
                 .orElseThrow(() -> new RuntimeException("Container not found"));
 
@@ -195,7 +213,6 @@ public class DockerService {
 
     public List<ContainerInfo> getExpiredContainers() {
         List<ContainerInfo> containersInfo = containerInfoRepository.findAll();
-
 
 
         return containersInfo.stream()

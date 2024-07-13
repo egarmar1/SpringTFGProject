@@ -40,7 +40,6 @@ public class DockerController {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-
     @GetMapping("/disconnect")
     public void disconnect(@RequestParam("containerId") String containerId){
         dockerService.stopAndRemoveContainer(containerId);
