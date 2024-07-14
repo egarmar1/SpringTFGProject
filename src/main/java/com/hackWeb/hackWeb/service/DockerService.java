@@ -31,7 +31,7 @@ public class DockerService {
     private final AttackRepository attackRepository;
 
     private Process websockifyProcess;
-    private static final String INIT_SQL_PATH = "G:/Mi unidad/hackWeb/docker/sqli1Init.sql";
+    private static final String INIT_SQL_BASE_PATH = "G:/Mi unidad/hackWeb/docker/sqlInits/";
 
     public DockerService(DockerClient dockerClient, ContainerInfoRepository containerInfoRepository, UserService userService, AttackRepository attackRepository) {
         this.dockerClient = dockerClient;
@@ -42,7 +42,7 @@ public class DockerService {
 
 
     //    @Transactional
-    public String createContainers(String imageName, String vncPassword) {
+    public String createContainers(String imageName, String vncPassword, String initSqlFileName, String databaseName) {
 
         String networkName = createUniqueNetwork();
         String uniqueMySQLContainerName = "mysql-" + UUID.randomUUID();
@@ -50,12 +50,13 @@ public class DockerService {
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
 
+        String initSqlPath = INIT_SQL_BASE_PATH + initSqlFileName;
 
         CreateContainerResponse mysqlContainer = dockerClient.createContainerCmd("mysql:latest")
                 .withName(uniqueMySQLContainerName)
                 .withEnv("MYSQL_ROOT_PASSWORD=Kike2016+")
                 .withHostConfig(HostConfig.newHostConfig()
-                        .withMounts(Collections.singletonList(new Mount().withType(MountType.BIND).withSource(INIT_SQL_PATH).withTarget("/docker-entrypoint-initdb.d/sqli1Init.sql")))
+                        .withMounts(Collections.singletonList(new Mount().withType(MountType.BIND).withSource(initSqlPath).withTarget("/docker-entrypoint-initdb.d/" + initSqlFileName)))
                         .withNetworkMode(networkName))
                 .exec();
 
@@ -64,7 +65,7 @@ public class DockerService {
             Thread.sleep(5000);
 
             // Crear el contenedor de la aplicación Spring Boot
-            String springDatasourceUrl = "SPRING_DATASOURCE_URL=jdbc:mysql://" + uniqueMySQLContainerName + ":3306/sqliWeb";
+            String springDatasourceUrl = "SPRING_DATASOURCE_URL=jdbc:mysql://" + uniqueMySQLContainerName + ":3306/" + databaseName;
             CreateContainerResponse appContainer = dockerClient.createContainerCmd(imageName)
                     .withHostConfig(HostConfig.newHostConfig()
                             .withPortBindings(new PortBinding(Ports.Binding.bindPort(containerHostPort), ExposedPort.tcp(5901)))

@@ -86,6 +86,7 @@ public class Video {
                 ", title='" + title + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", videoFile='" + videoFile + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 

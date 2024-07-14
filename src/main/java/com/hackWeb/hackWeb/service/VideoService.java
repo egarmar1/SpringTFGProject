@@ -39,4 +39,8 @@ public class VideoService {
         return new VideoDto(ia.getId(),ia.getTitle(),ia.getDifficulty(),ia.getVideoFile(),attack, typeAttack, ia.getIsSaved(),ia.getIsCompleted());
 
     }
+
+    public List<Video> getAllByAttackId(int attackId) {
+        return videoRepository.findByAttackId(attackId);
+    }
 }

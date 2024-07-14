@@ -24,5 +24,7 @@ public interface VideoRepository extends JpaRepository<Video, Integer> {
             "INNER JOIN user_video uv ON uv.video_id = v.id " +
             "WHERE uv.user_id = :userId ", nativeQuery = true)
     List<IVideo> getAllByUserId(@Param("userId") int userId);
+
+    List<Video> findByAttackId(int attackId);
 }
 

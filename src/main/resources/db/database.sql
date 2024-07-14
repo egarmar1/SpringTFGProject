@@ -64,6 +64,8 @@ CREATE TABLE attack (
     question VARCHAR(255),
     answer VARCHAR(255),
     docker_image_name  VARCHAR(50) UNIQUE NOT NULL,
+    init_sql_path_name VARCHAR(50) DEFAULT 'sqli1Init.sql',
+    database_name VARCHAR(50) DEFAULT 'sqli1Web',
 	FOREIGN KEY (type_attack_id) references type_attack(id)
 );
 
@@ -127,15 +129,16 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 (3, 'XSS');
 
 -- Introducimos ataques
+
+
+INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, description, posted_date , docker_image_name, init_sql_path_name, database_name) VALUES
+(1, 'The first sql attack', 'Easy', 1,'Introduce el flag', '23bdss', 'En este laboratorio practicaremos un ejemplo básico de SQLI. Accede al localhost:8082 del laboratorio y ejecuta un SQLI para conseguir la flag.', '2024-05-23' ,'sqli-lab', 'sqli1Init.sql', 'sqli1Web'),
+(2, 'Basic XSS attack', 'Easy', 3, 'Introduce el flag', '$2b$12$O4s8yJdV81rPQoq6xUQ9iOnz7b7RnksD58g1EmUGkO4i.CdP4S2Bi', 'Este laboratorio está diseñado para practicar un ejemplo básico del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador.','2024-06-10',  'xss1-lab', 'xss1Init.sql', 'xss1Web');
+
 INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, docker_image_name) VALUES
-(1, 'The first sql attack', 'Easy', 1,'Introduce the flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 'sqli-lab'),
-(2, 'The second sql attack', 'Medium', 1, 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
-(3, 'The third sql attack', 'Hard', 1, 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
-(4, 'The final sql attack', 'Medium', 1, 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
-
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, description, docker_image_name) VALUES
-(5, 'Basic XSS attack', 'Easy', 3, 'Introduce el flag', '$2b$12$O4s8yJdV81rPQoq6xUQ9iOnz7b7RnksD58g1EmUGkO4i.CdP4S2Bi', 'Este laboratorio está diseñado para practicar un ejemplo básico del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador.', 'vnc-lab');
-
+(3, 'The second sql attack', 'Medium', 1, 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
+(4, 'The third sql attack', 'Hard', 1, 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
+(5, 'The final sql attack', 'Medium', 1, 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
 
 -- Introducimos usuarios
 INSERT INTO hackweb.user (id, email, is_active, password, registration_date, user_type_id) VALUES

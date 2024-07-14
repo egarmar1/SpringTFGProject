@@ -75,7 +75,7 @@
             </div>
 
 
-            <div class="mt-3 px-3" sec:authorize="hasAuthority('Student')">
+            <div class="mt-3 px-3" >
                 <div class="row row justify-content-center">
                     <div class="col-md-3">
 
@@ -90,6 +90,8 @@
                         </form>
 
                     </div>
+                    <br>
+                    <hr>
                     <div class="col-md-3">
                         <form th:action="@{/video/markWatched/{id}(id=${videoDetails.id})}" method="post">
                             <button class="btn-sec btn-black w-100" type="submit" th:if="${videoDetails.completed == false}">Marcar como visto

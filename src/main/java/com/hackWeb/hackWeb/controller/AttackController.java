@@ -30,14 +30,15 @@ public class AttackController {
     private final UserAttackService userAttackService;
     private final TypeAttackService typeAttackService;
 
-    private final UserVideoService userVideoService;
+    private final VideoService videoService;
 
-    public AttackController(AttackService attackService, UserService userService, UserAttackService userAttackService, TypeAttackService typeAttackService, UserVideoService userVideoService) {
+
+    public AttackController(AttackService attackService, UserService userService, UserAttackService userAttackService, TypeAttackService typeAttackService, VideoService videoService) {
         this.attackService = attackService;
         this.userService = userService;
         this.userAttackService = userAttackService;
         this.typeAttackService = typeAttackService;
-        this.userVideoService = userVideoService;
+        this.videoService = videoService;
     }
 
 
@@ -56,8 +57,12 @@ public class AttackController {
 
             AttackDto attackDto = attackService.getOneByAttackIdAndUserId(attackId, user.getId());
 
+            List<Video> videos = videoService.getAllByAttackId(attackDto.getId());
 
             model.addAttribute("attackDetails", attackDto);
+            model.addAttribute("preVideo", videos.stream().filter(video -> video.getType() == VideoType.PRE).findFirst().orElse(null));
+            model.addAttribute("solVideo", videos.stream().filter(video -> video.getType() == VideoType.SOLUTION).findFirst().orElse(null));
+
 
         }
         return "attack-details";

@@ -1,12 +1,12 @@
 
-DROP DATABASE IF EXISTS sqliWeb;
+DROP DATABASE IF EXISTS sqli1Web;
 
 -- Crear la base de datos hackWebuser_profileuser_profileuser_profileuser_profile
 
-CREATE DATABASE sqliWeb;
+CREATE DATABASE sqli1Web;
 
 -- Usar la base de datos hackWeb
-USE sqliWeb;
+USE sqli1Web;
 
 -- Crear tabla product
 CREATE TABLE product (
@@ -29,5 +29,4 @@ INSERT INTO product (name, description, price, available) VALUES
 ('Monitor', 'A 27-inch 4K UHD monitor.', 349.99, false),
 ('Keyboard', 'A mechanical keyboard with RGB backlighting.', 89.99, false),
 ('Flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 49.99, false);
-
 

@@ -121,9 +121,6 @@
             Attack marked as uncompleted
         </div>
 
-        <div class="box" sec:authorize="hasAuthority('Admin')">
-            <h1 class="primary-title">Admin Dashboard</h1>
-        </div>
         <div class="box mt-3">
             <label class="large-label px-3 mb-3" sec:authorize="hasAuthority('Student')">Resultados de la búsqueda</label>
             <th:block th:each="attack:${attacks}">

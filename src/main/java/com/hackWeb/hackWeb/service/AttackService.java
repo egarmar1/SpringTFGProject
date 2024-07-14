@@ -69,7 +69,6 @@ public class AttackService {
 
         IAttack iAttack = attackRepository.getOneDtoById(attackId, userId);
 
-        System.out.println("Vale este es el postedDate que estamos cogiendo: " + iAttack.getPostedDate());
         return convertToAttackDto(iAttack);
     }
 

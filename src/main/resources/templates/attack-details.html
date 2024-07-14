@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" style="height: 100%">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" style="height: 100%">
 <head>
     <meta charset="UTF-8"/>
     <title>Candidate Dashboard</title>
@@ -29,17 +30,22 @@
     </div>
     <article>
         <div class="box px-3">
-            <a class="mt-3 ms-3 primary" id="back-link"><i class="fa-solid fa-angle-left me-1"></i> Volver a la búsqueda anterior </a>
+            <a class="mt-3 ms-3 primary" id="back-link"><i class="fa-solid fa-angle-left me-1"></i> Volver a la búsqueda
+                anterior </a>
             <h1 class="primary-title mt-3"> Info del ataque </h1>
             <div class="ms-3">
                 <h4 th:text="${attackDetails.title}" class="job-title text-left">The first Sql attack</h4>
                 <div class="mt-1">
-<!--                    <p th:text="${attackDetails.jobLocation.city+', '+ jobDetails.jobLocation.state}"-->
-<!--                       class="m-0"> California, USA</p>-->
-<!--                    <p th:text="${jobDetails.jobCompany.name}">Company</p>-->
+                    <!--                    <p th:text="${attackDetails.jobLocation.city+', '+ jobDetails.jobLocation.state}"-->
+                    <!--                       class="m-0"> California, USA</p>-->
+                    <!--                    <p th:text="${jobDetails.jobCompany.name}">Company</p>-->
                 </div>
+                <hr>
+                <div th:text="${attackDetails.description}"></div>
+                <br>
                 <div class="mt-3">
-                    <a th:href="@{/docker/connect(dockerImageName=${attackDetails.dockerImageName})}" class="laboratory-link" target="_blank">Visitar laboratorio</a>
+                    <a th:href="@{/docker/connect(dockerImageName=${attackDetails.dockerImageName})}"
+                       class="laboratory-link" target="_blank">Visitar laboratorio</a>
                 </div>
             </div>
         </div>
@@ -47,12 +53,12 @@
         <div class="box mt-3">
 
             <div class="box mt-3">
-                <label class="large-label px-3 mt-3"> Detalles del ataque </label>
+
 
                 <div class="job-row">
                     <div class="row">
                         <div class="col-md-3">
-                            <label class="text-left">Date Posted: <span th:text="${attackDetails.postedDate}">12 Nov, 2030</span></label>
+                            <label class="text-left">Fecha publicación: <span th:text="${attackDetails.postedDate}">12 Nov, 2030</span></label>
                         </div>
                         <div class="col-md-3 text-center">
                             <label>Dificultad: <span th:text="${attackDetails.difficulty}">Easy</span></label>
@@ -63,17 +69,20 @@
                     </div>
                     <!-- Video Section -->
                     <div class="row mt-3">
-                        <div class="col-md-6 text-center">
-                            <h3>Explanation video</h3>
+                        <div class="col-md-6 text-center" th:if="${preVideo != null}">
+                            <h3><a th:href="@{${'/video/watch/' + preVideo.id}}">Previous video</a></h3>
                             <video width="600" controls>
-                                <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.preVideoFile}}" type="video/mp4">
+                                <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.preVideoFile}}"
+                                        type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
-                        <div class="col-md-6 text-center" th:if="${attackDetails.completed == true}">
-                            <h3>Solution video</h3>
+                        <div class="col-md-6 text-center"
+                             th:if="${attackDetails.completed == true && solVideo != null}">
+                            <h3><a th:href="@{${'/video/watch/' + solVideo.id}}">Solution video</a></h3>
                             <video width="600" controls>
-                                <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.solutionVideoFile}}" type="video/mp4">
+                                <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.solutionVideoFile}}"
+                                        type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
@@ -82,13 +91,10 @@
             </div>
 
 
-
-
-            <div class="px-3 mb-3" >
+            <div class="px-3 mb-3">
                 <div class="row">
                     <div class="col-md-9">
-                        <label class="large-label "> Descripción del ataque </label>
-                        <div th:text="${attackDetails.description}"></div>
+
                     </div>
                     <div class="col-md-3 centerCandidate">
                         <div class="candidatesApplied">
@@ -102,28 +108,60 @@
 
             <div class="mt-3 px-3">
                 <div class="row justify-content-center">
-                    <div class="col-md-3">
-                        <form th:action="@{/attack-details/save/{id}(id=${attackDetails.id})}" method="post">
-                            <button class="btn-sec btn-black w-100" type="submit" th:if="${attackDetails.saved == false}">Guardar</button>
+                    <div class="col-md-3 d-flex flex-column">
+                        <form th:action="@{/attack-details/save/{id}(id=${attackDetails.id})}" method="post"
+                              class="mt-auto">
+                            <button class="btn-sec btn-black w-100" type="submit"
+                                    th:if="${attackDetails.saved == false}">Guardar
+                            </button>
                         </form>
-                        <form th:action="@{/attack-details/unsave/{id}(id=${attackDetails.id})}" method="post">
-                            <button class="btn-sec btn-red w-100" type="submit" th:if="${attackDetails.saved == true}">Quitar de Guardados</button>
+                        <form th:action="@{/attack-details/unsave/{id}(id=${attackDetails.id})}" method="post"
+                              class="mt-auto">
+                            <button class="btn-sec btn-red w-100" type="submit" th:if="${attackDetails.saved == true}">
+                                Quitar de Guardados
+                            </button>
                         </form>
                     </div>
-                    <div class="col-md-3" >
-                        <form id="completeForm" th:if="${attackDetails.completed == false}" th:action="@{/attack-details/complete/{id}(id=${attackDetails.id})}" method="post">
+
+                    <div class="col-md-3 d-flex flex-column">
+                        <form id="completeForm" th:if="${attackDetails.completed == false}"
+                              th:action="@{/attack-details/complete/{id}(id=${attackDetails.id})}" method="post">
                             <label for="completionInput" th:text="${attackDetails.question}">Introduce la flag</label>
-                            <input type="text" id="completionInput" name="answer" class="form-control mb-2" placeholder="Respuesta">
-                            <button class="btn-sec btn-black w-100" type="button" onclick="showCompletionModal()">Comprobar respuesta</button>
+                            <input type="text" id="completionInput" name="answer" class="form-control mb-2"
+                                   placeholder="Respuesta">
+                            <button class="btn-sec btn-black w-100" type="button" onclick="showCompletionModal()">
+                                Comprobar respuesta
+                            </button>
                         </form>
-                        <form th:action="@{/attack-details/uncomplete/{id}(id=${attackDetails.id})}" th:object="${attackDetails}" method="post">
-                            <button class="btn-sec btn-red w-100" th:if="${attackDetails.completed == true}">Desmarcar como completado</button>
+                        <form th:action="@{/attack-details/uncomplete/{id}(id=${attackDetails.id})}"
+                              th:object="${attackDetails}" method="post" class="mt-auto">
+                            <button class="btn-sec btn-red w-100" th:if="${attackDetails.completed == true}">Desmarcar
+                                como completado
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
 
+            <hr>
+            <div class="mt-3 px-3" th:if="${solVideo != null}">
+                <div class="d-flex justify-content-center">
+                    <form th:action="@{/video/watch/{id}(id=${solVideo.id})}" method="get">
+                        <button class="btn-sec btn-red btn-sm" type="submit">Ver video con la solución</button>
+                    </form>
+                </div>
+            </div>
+
+            <hr>
+
             <div class="mt-3 px-3" sec:authorize="hasAuthority('Admin')">
+                <div class="row justify-content-center">
+                    <div class="col-md-3 text-center">
+                        <h2>Admin options</h2>
+                    </div>
+
+                </div>
+
                 <div class="row justify-content-center">
                     <div class="col-md-3">
                         <form th:action="@{/dashboard/edit/{id}(id=${attackDetails.id})}" method="post">
@@ -142,7 +180,8 @@
     </article>
 </section>
 <!-- Modal -->
-<div class="modal fade" id="completionModal" tabindex="-1" role="dialog" aria-labelledby="completionModalLabel" aria-hidden="true">
+<div class="modal fade" id="completionModal" tabindex="-1" role="dialog" aria-labelledby="completionModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

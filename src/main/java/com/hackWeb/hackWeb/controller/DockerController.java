@@ -1,5 +1,7 @@
 package com.hackWeb.hackWeb.controller;
 
+import com.hackWeb.hackWeb.entity.Attack;
+import com.hackWeb.hackWeb.service.AttackService;
 import com.hackWeb.hackWeb.service.DockerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +17,20 @@ public class DockerController {
 
 
     private final DockerService dockerService;
+    private final AttackService attackService;
 
-    public DockerController(DockerService dockerService) {
+    public DockerController(DockerService dockerService, AttackService attackService) {
         this.dockerService = dockerService;
+        this.attackService = attackService;
     }
 
 
     @GetMapping("/connect")
     public RedirectView connect(@RequestParam("dockerImageName") String imageName ){
         String vncPassword = generatePassword();
-        String containerId = dockerService.createContainers(imageName, vncPassword);
+
+        Attack attack = attackService.getOneByDockerImageName(imageName);
+        String containerId = dockerService.createContainers(imageName, vncPassword,attack.getInitSqlPathName(), attack.getDatabaseName());
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
         String vncPort = containerInfo.get("vncPort");

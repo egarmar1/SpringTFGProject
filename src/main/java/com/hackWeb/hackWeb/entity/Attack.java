@@ -1,7 +1,6 @@
 package com.hackWeb.hackWeb.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -49,6 +48,10 @@ public class Attack {
     @NotEmpty(message = "Tienes que introducir una imagen de docker")
     @Column(unique = true)
     private String dockerImageName;
+
+    private String initSqlPathName;
+
+    private String databaseName;
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "attack")
     private List<UserAttack> userAttacks;
 
@@ -61,7 +64,7 @@ public class Attack {
         this.title = title;
     }
 
-    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String question, String answer, List<UserAttack> userAttacks, String dockerImageName) {
+    public Attack(int id, String title, String difficulty, String description, Date postedDate, TypeAttack typeAttack, List<Video> videos, String question, String answer, List<UserAttack> userAttacks, String dockerImageName, String initSqlPathName, String databaseName) {
         this.id = id;
         this.title = title;
         this.difficulty = difficulty;
@@ -73,6 +76,8 @@ public class Attack {
         this.answer = answer;
         this.userAttacks = userAttacks;
         this.dockerImageName = dockerImageName;
+        this.initSqlPathName = initSqlPathName;
+        this.databaseName = databaseName;
     }
 
     public int getId() {
@@ -177,4 +182,19 @@ public class Attack {
                 '}';
     }
 
+    public String getInitSqlPathName() {
+        return initSqlPathName;
+    }
+
+    public void setInitSqlPathName(String initSqlPathName) {
+        this.initSqlPathName = initSqlPathName;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 }
