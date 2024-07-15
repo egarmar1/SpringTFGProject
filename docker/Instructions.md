@@ -2,3 +2,10 @@
 2. Run container with `docker run -d -p 5901:5901 --name lab1 vnc-lab`
 3. Start noVNC service `A:\Documentos\TFGDocker\vnc-lab\noVNC>websockify --web ./ 6080 localhost:5901`
 4. Access NoVnc `http://localhost:6080/vnc.html`
+
+
+## Parar todos noVnc
+
+```powershell
+    Get-Process websockify | ForEach-Object { Stop-Process -Id $_.Id -Force }
+```

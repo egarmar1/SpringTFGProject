@@ -108,6 +108,7 @@ CREATE TABLE container_info(
     web_sockify_port INT ,
     container_port INT  NOT NULL,
     expiry_date TIMESTAMP NOT NULL,
+    network_id VARCHAR(255),
     user_id INT,
     attack_id INT,
 

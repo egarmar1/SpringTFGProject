@@ -48,7 +48,8 @@ public class DockerController {
 
     @GetMapping("/disconnect")
     public void disconnect(@RequestParam("containerId") String containerId){
-        dockerService.stopAndRemoveContainer(containerId);
+//        dockerService.stopAndRemoveContainer(containerId);
         dockerService.stopWebSockify(containerId);
+        dockerService.removeNetwork(containerId);
     }
 }

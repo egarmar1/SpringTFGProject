@@ -3,8 +3,6 @@ package com.hackWeb.hackWeb.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 
 @Entity
 @Table(name = "container_info")
@@ -29,17 +27,20 @@ public class ContainerInfo {
 
     private LocalDateTime expiryDate;
 
+    private String networkId;
+
     public ContainerInfo() {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
-    public ContainerInfo(int id, String containerId, Integer webSockifyPort, int containerPort, User user, Attack attack) {
+    public ContainerInfo(int id, String containerId, Integer webSockifyPort, int containerPort, User user, Attack attack, String networkId) {
         this.id = id;
         this.containerId = containerId;
         this.webSockifyPort = webSockifyPort;
         this.containerPort = containerPort;
         this.user = user;
         this.attack = attack;
+        this.networkId = networkId;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
@@ -103,17 +104,20 @@ public class ContainerInfo {
         return "ContainerInfo{" +
                 "id=" + id +
                 ", containerId='" + containerId + '\'' +
-                ", webSockifyPort=" + webSockifyPort +
-                ", containerPort=" + containerPort +
                 ", user=" + user +
                 ", attack=" + attack +
                 '}';
     }
 
-
-
-
     private LocalDateTime calculateExpiryDate(int expiration){
         return LocalDateTime.now().plusMinutes(expiration);
+    }
+
+    public String getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
     }
 }
