@@ -45,7 +45,19 @@
                 <br>
                 <div class="mt-3">
                     <a th:href="@{/docker/connect(dockerImageName=${attackDetails.dockerImageName})}"
-                       class="laboratory-link" target="_blank">Visitar laboratorio</a>
+                       class="btn btn-primary laboratory-link" target="_blank">Visitar laboratorio</a>
+                </div>
+                <div class="mt-3 d-flex align-items-center">
+                    <a th:href="@{/docker/reset(dockerImageName=${attackDetails.dockerImageName})}"
+                       class="btn btn-danger laboratory-link" target="_blank">Resetear laboratorio</a>
+                    <span>(Clicka si quieres resetear el laboratorio que tengas activo)</span>
+
+                </div>
+                <div th:if="${param.justReseted}" class="alert alert-success">
+                    Lab successfully reset
+                </div>
+                <div th:if="${param.noLabActive}" class="alert alert-success">
+                    There is no lab active
                 </div>
             </div>
         </div>

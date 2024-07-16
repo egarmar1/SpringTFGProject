@@ -27,15 +27,17 @@ public class DockerService {
 
     private final DockerClient dockerClient;
     private final ContainerInfoRepository containerInfoRepository;
+    private final ContainerInfoService containerInfoService;
     private final UserService userService;
     private final AttackRepository attackRepository;
 
     private Process websockifyProcess;
     private static final String INIT_SQL_BASE_PATH = "G:/Mi unidad/hackWeb/docker/sqlInits/";
 
-    public DockerService(DockerClient dockerClient, ContainerInfoRepository containerInfoRepository, UserService userService, AttackRepository attackRepository) {
+    public DockerService(DockerClient dockerClient, ContainerInfoRepository containerInfoRepository, ContainerInfoService containerInfoService, UserService userService, AttackRepository attackRepository) {
         this.dockerClient = dockerClient;
         this.containerInfoRepository = containerInfoRepository;
+        this.containerInfoService = containerInfoService;
         this.userService = userService;
         this.attackRepository = attackRepository;
     }
@@ -68,8 +70,8 @@ public class DockerService {
 
             startWebSockify(websockifyHostPort, containerHostPort);
 
-            createContainerInDB(appContainerId,websockifyHostPort,containerHostPort,networkId,userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
-            createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
+            containerInfoService.createContainerInDB(appContainerId,websockifyHostPort, vncPassword,containerHostPort,networkId,userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
+            containerInfoService.createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
 
 
 
@@ -105,27 +107,7 @@ public class DockerService {
         return mysqlContainer;
     }
 
-    private void createContainerInDB(String containerId, int websockifyHostPort, int containerHostPort, String networkId, User currentUser, Attack attack) {
-        ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.setContainerId(containerId);
-        containerInfo.setWebSockifyPort(websockifyHostPort);
-        containerInfo.setContainerPort(containerHostPort);
-        containerInfo.setNetworkId(networkId);
-        containerInfo.setUser(currentUser);
-        containerInfo.setAttack(attack);
 
-        containerInfoRepository.save(containerInfo);
-    }
-
-    private void createContainerInDB(String containerId, String networkId, User currentUser, Attack attack) {
-        ContainerInfo containerInfo = new ContainerInfo();
-        containerInfo.setContainerId(containerId);
-        containerInfo.setNetworkId(networkId);
-        containerInfo.setUser(currentUser);
-        containerInfo.setAttack(attack);
-
-        containerInfoRepository.save(containerInfo);
-    }
 
 
     private String createUniqueNetwork() {
@@ -266,4 +248,28 @@ public class DockerService {
     public void removeNetwork(String networkId) {
         executeDockerCommand(() -> dockerClient.removeNetworkCmd(networkId).exec(),networkId);
     }
+
+    public void cleanUpExpiredContainersAndNetworks() {
+        List<ContainerInfo> expiredContainers = getExpiredContainers();
+
+        Map<String, List<ContainerInfo>> expiredContainersByNetwork = expiredContainers.stream()
+                .collect(Collectors.groupingBy(ContainerInfo::getNetworkId));
+
+        System.out.println("Expired Containers are: " + expiredContainers);
+        System.out.println("Container by network: " + expiredContainersByNetwork);
+
+        expiredContainersByNetwork
+                .forEach((networkId, containersList) -> {
+                    containersList.forEach(container -> {
+                        if (container.getWebSockifyPort() != null) {
+                            stopWebSockify(container.getContainerId());
+                        }
+                        stopAndRemoveContainer(container.getContainerId());
+                    });
+
+                    removeNetwork(networkId);
+                });
+    }
+
+
 }

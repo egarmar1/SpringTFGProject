@@ -28,12 +28,13 @@ public class ContainerInfo {
     private LocalDateTime expiryDate;
 
     private String networkId;
+    private String vncPassword;
 
     public ContainerInfo() {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
-    public ContainerInfo(int id, String containerId, Integer webSockifyPort, int containerPort, User user, Attack attack, String networkId) {
+    public ContainerInfo(int id, String containerId, Integer webSockifyPort, int containerPort, User user, Attack attack, String networkId, String vncPassword) {
         this.id = id;
         this.containerId = containerId;
         this.webSockifyPort = webSockifyPort;
@@ -41,6 +42,7 @@ public class ContainerInfo {
         this.user = user;
         this.attack = attack;
         this.networkId = networkId;
+        this.vncPassword = vncPassword;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
@@ -99,15 +101,6 @@ public class ContainerInfo {
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
-    @Override
-    public String toString() {
-        return "ContainerInfo{" +
-                "id=" + id +
-                ", containerId='" + containerId + '\'' +
-                ", user=" + user +
-                ", attack=" + attack +
-                '}';
-    }
 
     private LocalDateTime calculateExpiryDate(int expiration){
         return LocalDateTime.now().plusMinutes(expiration);
@@ -120,4 +113,23 @@ public class ContainerInfo {
     public void setNetworkId(String networkId) {
         this.networkId = networkId;
     }
+
+    public String getVncPassword() {
+        return vncPassword;
+    }
+
+    public void setVncPassword(String vncPassword) {
+        this.vncPassword = vncPassword;
+    }
+    @Override
+    public String toString() {
+        return "ContainerInfo{" +
+                "id=" + id +
+                ", containerId='" + containerId + '\'' +
+                ", user=" + user +
+                ", attack=" + attack +
+                '}';
+    }
+
+
 }

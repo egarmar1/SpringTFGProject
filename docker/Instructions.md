@@ -6,6 +6,7 @@
 
 ## Parar todos noVnc
 
+En powershell:
 ```powershell
     Get-Process websockify | ForEach-Object { Stop-Process -Id $_.Id -Force }
 ```

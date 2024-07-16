@@ -106,6 +106,7 @@ CREATE TABLE container_info(
 	id INT NOT NULL AUTO_INCREMENT,
     container_id VARCHAR(255) NOT NULL,
     web_sockify_port INT ,
+    vnc_password VARCHAR(255),
     container_port INT  NOT NULL,
     expiry_date TIMESTAMP NOT NULL,
     network_id VARCHAR(255),

@@ -1,15 +1,21 @@
 package com.hackWeb.hackWeb.controller;
 
 import com.hackWeb.hackWeb.entity.Attack;
+import com.hackWeb.hackWeb.entity.ContainerInfo;
 import com.hackWeb.hackWeb.service.AttackService;
+import com.hackWeb.hackWeb.service.ContainerInfoService;
 import com.hackWeb.hackWeb.service.DockerService;
+import com.hackWeb.hackWeb.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/docker")
@@ -17,26 +23,60 @@ public class DockerController {
 
 
     private final DockerService dockerService;
+    private final ContainerInfoService containerInfoService;
     private final AttackService attackService;
+    private final UserService userService;
 
-    public DockerController(DockerService dockerService, AttackService attackService) {
+    public DockerController(DockerService dockerService, ContainerInfoService containerInfoService, AttackService attackService, UserService userService) {
         this.dockerService = dockerService;
+        this.containerInfoService = containerInfoService;
         this.attackService = attackService;
+        this.userService = userService;
     }
 
 
     @GetMapping("/connect")
-    public RedirectView connect(@RequestParam("dockerImageName") String imageName ){
+    public RedirectView connect(@RequestParam("dockerImageName") String imageName) {
+        List<ContainerInfo> containersByUserAndImage = containerInfoService.getContainersByUserAndImage(userService.getCurrentUser().getId(), imageName);
+        ContainerInfo containerWithVncPort = containersByUserAndImage.stream()
+                .filter(container -> container.getWebSockifyPort() != null).findFirst().orElse(null);
+
+        if (containerWithVncPort != null) {
+            return new RedirectView("http://localhost:" + containerWithVncPort.getWebSockifyPort() + "/vnc.html?password=" + containerWithVncPort.getVncPassword());
+        }
         String vncPassword = generatePassword();
 
         Attack attack = attackService.getOneByDockerImageName(imageName);
-        String containerId = dockerService.createContainers(imageName, vncPassword,attack.getInitSqlPathName(), attack.getDatabaseName());
+        String containerId = dockerService.createContainers(imageName, vncPassword, attack.getInitSqlPathName(), attack.getDatabaseName());
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
         String vncPort = containerInfo.get("vncPort");
 
         return new RedirectView("http://localhost:" + vncPort + "/vnc.html?password=" + vncPassword);
 
+    }
+
+    @GetMapping("/reset")
+    public String reset(@RequestParam("dockerImageName") String imageName, Model model) {
+        List<ContainerInfo> containersByUserAndImage = containerInfoService.getContainersByUserAndImage(userService.getCurrentUser().getId(), imageName);
+        ContainerInfo containerWithVncPort = containersByUserAndImage.stream()
+                .filter(container -> container.getWebSockifyPort() != null).findFirst().orElse(null);
+
+        Attack attack = attackService.getOneByDockerImageName(imageName);
+        if (containerWithVncPort == null) {
+            model.addAttribute("error", "There is no laboratory active");
+            return "redirect:/attack-details/" + attack.getId() + "?noLabActive=false";
+        }
+
+        String vncPassword = generatePassword();
+
+
+        String containerId = dockerService.createContainers(imageName, vncPassword, attack.getInitSqlPathName(), attack.getDatabaseName());
+
+        Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
+        String vncPort = containerInfo.get("vncPort");
+
+        return "redirect:/attack-details/" + attack.getId() + "?justReseted=true";
     }
 
     private String generatePassword() {
@@ -46,10 +86,4 @@ public class DockerController {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    @GetMapping("/disconnect")
-    public void disconnect(@RequestParam("containerId") String containerId){
-//        dockerService.stopAndRemoveContainer(containerId);
-        dockerService.stopWebSockify(containerId);
-        dockerService.removeNetwork(containerId);
-    }
 }
