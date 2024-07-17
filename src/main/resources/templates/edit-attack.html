@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="col-md-7 container myForm">
-        <form id="job-main-form" th:action="@{/attack/addNew}" th:object="${attack}" method="post" class="job-add-form" enctype="multipart/form-data">
+        <form id="job-main-form" th:action="@{/attack/update}" th:object="${attack}" method="post"  enctype="multipart/form-data">
             <input hidden type="text" th:field="*{id}">
             <div class="row">
                 <div class="col-lg-12">

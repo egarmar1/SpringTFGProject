@@ -6,6 +6,8 @@ import com.hackWeb.hackWeb.exception.MyException;
 import com.hackWeb.hackWeb.service.*;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import java.util.*;
 
 @Controller
 public class AttackController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AttackController.class);
 
     private final AttackService attackService;
     private final UserService userService;
@@ -194,6 +198,7 @@ public class AttackController {
 
                 return "add-attack";
             }
+
             List<Video> videosToSave = new ArrayList<>();
 
             if(preVideoFile != null && !preVideoFile.isEmpty()){
@@ -245,4 +250,87 @@ public class AttackController {
 
             return "redirect:/dashboard/?attackSaved=true";
         }
+
+    @GetMapping("/attack/edit/{id}")
+    public String editAttackView(Model model,@PathVariable("id") int id  ) {
+
+        UserProfile userProfile = userService.getCurrentUser().getUserProfile();
+        Attack attack = attackService.getOneById(id);
+        List<TypeAttack> typeAttacks = typeAttackService.getAll();
+
+        model.addAttribute("attack", attack);
+        model.addAttribute("typeAttacks", typeAttacks);
+        model.addAttribute("user", userProfile);
+
+        return "edit-attack";
+    }
+    @PostMapping("/attack/update")
+    public String udpateAttack(@Valid Attack attack,
+                               BindingResult bindingResult,
+                               @RequestParam("preVideoFile") MultipartFile preVideoFile,
+                               @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            UserProfile userProfile = userService.getCurrentUser().getUserProfile();
+            List<TypeAttack> typeAttacks = typeAttackService.getAll();
+
+            model.addAttribute("attack", attack);
+            model.addAttribute("typeAttacks", typeAttacks);
+            model.addAttribute("user", userProfile);
+
+            return "edit-attack";
+        }
+
+
+        if(preVideoFile != null && !preVideoFile.isEmpty()){
+            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+            Video preVideo = new Video(attack, VideoType.PRE);
+            preVideo.setDifficulty(attack.getDifficulty());
+            preVideo.setTitle(attack.getVideos().get(0).getTitle());
+            preVideo.setTypeAttack(attack.getTypeAttack());
+            preVideo.setVideoFile(preFilename);
+            attack.getVideos().add(0,preVideo);
+        }
+
+        if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
+            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+            Video solutionVideo = new Video(attack, VideoType.SOLUTION);
+            solutionVideo.setDifficulty(attack.getDifficulty());
+            solutionVideo.setTitle(attack.getVideos().get(1).getTitle());
+            solutionVideo.setTypeAttack(attack.getTypeAttack());
+            solutionVideo.setVideoFile(solutionFilename);
+            attack.getVideos().add(1,solutionVideo);
+        }
+
+
+        String uploadDir = "videos/attack/" + attack.getId();
+
+        try{
+            if(preVideoFile != null && !preVideoFile.isEmpty()) {
+                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
+            }
+            if(solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+            }
+        }catch (Exception exc){
+            exc.printStackTrace();
+        }
+
+
+
+        try {
+            attackService.save(attack);
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("error", "El docker image name ya existe");
+            return "add-attack";
+        }
+
+
+
+
+
+        return "df";
+    }
 }

@@ -3,9 +3,7 @@ package com.hackWeb.hackWeb.service;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
-import com.hackWeb.hackWeb.entity.Attack;
 import com.hackWeb.hackWeb.entity.ContainerInfo;
-import com.hackWeb.hackWeb.entity.User;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.ContainerInfoRepository;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -70,9 +68,8 @@ public class DockerService {
 
             startWebSockify(websockifyHostPort, containerHostPort);
 
-            containerInfoService.createContainerInDB(appContainerId,websockifyHostPort, vncPassword,containerHostPort,networkId,userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
-            containerInfoService.createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(),attackRepository.findByDockerImageName(imageName));
-
+            containerInfoService.createContainerInDB(appContainerId, websockifyHostPort, vncPassword, containerHostPort, networkId, userService.getCurrentUser(), attackRepository.findByDockerImageName(imageName));
+            containerInfoService.createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(), attackRepository.findByDockerImageName(imageName));
 
 
             Thread.sleep(1000);
@@ -106,8 +103,6 @@ public class DockerService {
                 .exec();
         return mysqlContainer;
     }
-
-
 
 
     private String createUniqueNetwork() {
@@ -153,7 +148,12 @@ public class DockerService {
     public void stopWebSockify(String containerId) {
         ContainerInfo containerInfo = containerInfoRepository.findByContainerId(containerId).orElseThrow(() -> new RuntimeException("Container not found"));
 
-        int webSockifyPort = containerInfo.getWebSockifyPort();
+        Integer webSockifyPort = containerInfo.getWebSockifyPort();
+
+        if (webSockifyPort == null) {
+            return;
+        }
+
 
         try {
             // Ejecutar el comando netstat para encontrar el PID que usa el puerto
@@ -188,10 +188,11 @@ public class DockerService {
     }
 
     @Transactional
-    public void stopAndRemoveContainer(String containerId) {
+    public void removeContainerAndItsVnc(String containerId) {
 
         executeDockerCommand(() -> dockerClient.stopContainerCmd(containerId).exec(), containerId);
         executeDockerCommand(() -> dockerClient.removeContainerCmd(containerId).exec(), containerId);
+        executeDockerCommand(() -> stopWebSockify(containerId), containerId);
         removeContainer(containerId);
     }
 
@@ -246,7 +247,7 @@ public class DockerService {
     }
 
     public void removeNetwork(String networkId) {
-        executeDockerCommand(() -> dockerClient.removeNetworkCmd(networkId).exec(),networkId);
+        executeDockerCommand(() -> dockerClient.removeNetworkCmd(networkId).exec(), networkId);
     }
 
     public void cleanUpExpiredContainersAndNetworks() {
@@ -260,13 +261,7 @@ public class DockerService {
 
         expiredContainersByNetwork
                 .forEach((networkId, containersList) -> {
-                    containersList.forEach(container -> {
-                        if (container.getWebSockifyPort() != null) {
-                            stopWebSockify(container.getContainerId());
-                        }
-                        stopAndRemoveContainer(container.getContainerId());
-                    });
-
+                    containersList.forEach(container -> removeContainerAndItsVnc(container.getContainerId()));
                     removeNetwork(networkId);
                 });
     }

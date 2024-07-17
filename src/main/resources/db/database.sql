@@ -109,9 +109,9 @@ CREATE TABLE container_info(
     vnc_password VARCHAR(255),
     container_port INT  NOT NULL,
     expiry_date TIMESTAMP NOT NULL,
-    network_id VARCHAR(255),
-    user_id INT,
-    attack_id INT,
+    network_id VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    attack_id INT NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(user_id) references user(id),

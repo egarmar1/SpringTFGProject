@@ -7,7 +7,6 @@ import com.hackWeb.hackWeb.service.ContainerInfoService;
 import com.hackWeb.hackWeb.service.DockerService;
 import com.hackWeb.hackWeb.service.UserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -15,7 +14,6 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/docker")
@@ -57,20 +55,23 @@ public class DockerController {
     }
 
     @GetMapping("/reset")
-    public String reset(@RequestParam("dockerImageName") String imageName, Model model) {
+    public String reset(@RequestParam("dockerImageName") String imageName) {
         List<ContainerInfo> containersByUserAndImage = containerInfoService.getContainersByUserAndImage(userService.getCurrentUser().getId(), imageName);
         ContainerInfo containerWithVncPort = containersByUserAndImage.stream()
                 .filter(container -> container.getWebSockifyPort() != null).findFirst().orElse(null);
 
         Attack attack = attackService.getOneByDockerImageName(imageName);
         if (containerWithVncPort == null) {
-            model.addAttribute("error", "There is no laboratory active");
+
             return "redirect:/attack-details/" + attack.getId() + "?noLabActive=false";
         }
 
+        containersByUserAndImage.forEach(container -> {
+            dockerService.removeContainerAndItsVnc(container.getContainerId());
+        });
+        dockerService.removeNetwork(containersByUserAndImage.getFirst().getNetworkId());
+
         String vncPassword = generatePassword();
-
-
         String containerId = dockerService.createContainers(imageName, vncPassword, attack.getInitSqlPathName(), attack.getDatabaseName());
 
         Map<String, String> containerInfo = dockerService.getContainerInfo(containerId);
