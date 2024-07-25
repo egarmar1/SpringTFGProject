@@ -12,9 +12,6 @@ public class Video {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-
-    private String title;
-
     private String difficulty;
     private String videoFile;
 
@@ -36,9 +33,8 @@ public class Video {
         this.type = type;
     }
 
-    public Video(int id, String title, String difficulty, String videoFile, TypeAttack typeAttack, VideoType type, Attack attack, TypeAttack typeAttack1) {
+    public Video(int id, String difficulty, String videoFile, TypeAttack typeAttack, VideoType type, Attack attack, TypeAttack typeAttack1) {
         this.id = id;
-        this.title = title;
         this.difficulty = difficulty;
         this.videoFile = videoFile;
         this.type = type;
@@ -52,14 +48,6 @@ public class Video {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDifficulty() {
@@ -83,7 +71,6 @@ public class Video {
     public String toString() {
         return "Video{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", videoFile='" + videoFile + '\'' +
                 ", type='" + type + '\'' +
@@ -113,4 +100,6 @@ public class Video {
     public void setType(VideoType type) {
         this.type = type;
     }
+
+
 }

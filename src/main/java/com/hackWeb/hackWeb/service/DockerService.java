@@ -50,12 +50,18 @@ public class DockerService {
         int containerHostPort = findFreePort();
         int websockifyHostPort = findFreePort();
 
+        CreateContainerResponse mysqlContainer = new CreateContainerResponse();
 
-        CreateContainerResponse mysqlContainer = createMySqlContainer(initSqlFileName, uniqueMySQLContainerName, networkName);
-
-        dockerClient.startContainerCmd(mysqlContainer.getId()).exec();
         try {
+        if(!initSqlFileName.isEmpty()) {
+            mysqlContainer = createMySqlContainer(initSqlFileName, uniqueMySQLContainerName, networkName);
+            dockerClient.startContainerCmd(mysqlContainer.getId()).exec();
             Thread.sleep(5000);
+        }
+
+
+
+
 
             // Crear el contenedor de la aplicación Spring Boot
             String springDatasourceUrl = "SPRING_DATASOURCE_URL=jdbc:mysql://" + uniqueMySQLContainerName + ":3306/" + databaseName;
@@ -69,10 +75,14 @@ public class DockerService {
             startWebSockify(websockifyHostPort, containerHostPort);
 
             containerInfoService.createContainerInDB(appContainerId, websockifyHostPort, vncPassword, containerHostPort, networkId, userService.getCurrentUser(), attackRepository.findByDockerImageName(imageName));
-            containerInfoService.createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(), attackRepository.findByDockerImageName(imageName));
+
+            if(!initSqlFileName.isEmpty()) {
+                Thread.sleep(1000);
+                containerInfoService.createContainerInDB(mysqlContainer.getId(), networkId, userService.getCurrentUser(), attackRepository.findByDockerImageName(imageName));
+            }
 
 
-            Thread.sleep(1000);
+
 
             return appContainer.getId();
         } catch (InterruptedException e) {

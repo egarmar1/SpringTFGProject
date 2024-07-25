@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -105,16 +106,14 @@ public class AttackController {
     }
 
     @PostMapping("/attack-details/complete/{id}")
-    public ResponseEntity<Map<String,String>> completeAttack(@PathVariable("id") int attackId,
-                                                             @RequestParam("answer") String answer,
-                                                             Model model) {
-
+    public ResponseEntity<Map<String, String>> completeAttack(@PathVariable("id") int attackId,
+                                                              @RequestParam("answer") String answer,
+                                                              Model model) {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
-
 
 
             String username = authentication.getName();
@@ -123,9 +122,9 @@ public class AttackController {
 
 
             Attack attack = attackService.getOneById(attackId);
-            Map<String,String> response = new HashMap<>();
+            Map<String, String> response = new HashMap<>();
 
-            if(!answer.equals(attack.getAnswer())){
+            if (!answer.equals(attack.getAnswer())) {
                 response.put("status", "incorrect");
                 response.put("message", "La respuesta es incorrecta.");
                 return ResponseEntity.ok(response);
@@ -141,8 +140,8 @@ public class AttackController {
             model.addAttribute("showModal", true); // Agregar atributo para mostrar el modal
 
 
-            response.put("status","correct");
-            response.put("solutionVideoId",solutionVideoId.toString());
+            response.put("status", "correct");
+            response.put("solutionVideoId", solutionVideoId.toString());
             return ResponseEntity.ok(response);
         }
 
@@ -180,79 +179,78 @@ public class AttackController {
     }
 
 
-        @PostMapping("/attack/addNew")
-        public String addNewAttack(@Valid Attack attack,
-                                   BindingResult bindingResult,
-                                   @RequestParam("preVideoFile") MultipartFile preVideoFile,
-                                   @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
-                                   Model model) {
+    @PostMapping("/attack/addNew")
+    public String addNewAttack(@Valid Attack attack,
+                               BindingResult bindingResult,
+                               @RequestParam("preVideoFile") MultipartFile preVideoFile,
+                               @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
+                               Model model) {
 
 
-            if (bindingResult.hasErrors()) {
-                UserProfile userProfile = userService.getCurrentUser().getUserProfile();
-                List<TypeAttack> typeAttacks = typeAttackService.getAll();
+        if (bindingResult.hasErrors()) {
+            UserProfile userProfile = userService.getCurrentUser().getUserProfile();
+            List<TypeAttack> typeAttacks = typeAttackService.getAll();
 
-                model.addAttribute("attack", attack);
-                model.addAttribute("typeAttacks", typeAttacks);
-                model.addAttribute("user", userProfile);
+            model.addAttribute("attack", attack);
+            model.addAttribute("typeAttacks", typeAttacks);
+            model.addAttribute("user", userProfile);
 
-                return "add-attack";
-            }
-
-            List<Video> videosToSave = new ArrayList<>();
-
-            if(preVideoFile != null && !preVideoFile.isEmpty()){
-                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-                Video preVideo = new Video(attack, VideoType.PRE);
-                preVideo.setDifficulty(attack.getDifficulty());
-                preVideo.setTitle(attack.getVideos().get(0).getTitle());
-                preVideo.setTypeAttack(attack.getTypeAttack());
-                preVideo.setVideoFile(preFilename);
-                videosToSave.add(preVideo);
-            }
-
-            if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
-                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-                Video solutionVideo = new Video(attack, VideoType.SOLUTION);
-                solutionVideo.setDifficulty(attack.getDifficulty());
-                solutionVideo.setTitle(attack.getVideos().get(1).getTitle());
-                solutionVideo.setTypeAttack(attack.getTypeAttack());
-                solutionVideo.setVideoFile(solutionFilename);
-                videosToSave.add(solutionVideo);
-            }
-
-
-            attack.setVideos(videosToSave);
-            attack.setPosted_date(new Date());
-
-            try {
-                attackService.save(attack);
-            } catch (DataIntegrityViolationException e) {
-                model.addAttribute("error", "El docker image name ya existe");
-                return "add-attack";
-            }
-
-            String uploadDir = "videos/attack/" + attack.getId();
-
-            try{
-                if(preVideoFile != null && !preVideoFile.isEmpty()) {
-                    String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-                    FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
-                }
-                if(solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
-                    String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-                    FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
-                }
-            }catch (Exception exc){
-                exc.printStackTrace();
-            }
-
-
-            return "redirect:/dashboard/?attackSaved=true";
+            return "add-attack";
         }
 
+        List<Video> videosToSave = new ArrayList<>();
+
+        if (preVideoFile != null && !preVideoFile.isEmpty()) {
+            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+            Video preVideo = new Video(attack, VideoType.PRE);
+            preVideo.setDifficulty(attack.getDifficulty());
+            preVideo.setTypeAttack(attack.getTypeAttack());
+            preVideo.setVideoFile(preFilename);
+            videosToSave.add(preVideo);
+        }
+
+        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+            Video solutionVideo = new Video(attack, VideoType.SOLUTION);
+            solutionVideo.setDifficulty(attack.getDifficulty());
+            solutionVideo.setTypeAttack(attack.getTypeAttack());
+            solutionVideo.setVideoFile(solutionFilename);
+            videosToSave.add(solutionVideo);
+        }
+
+
+        attack.setVideos(videosToSave);
+        attack.setPosted_date(new Date());
+
+        try {
+            attackService.save(attack);
+        } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Ya existe un laboratorio con esa imagen");
+            return "add-attack";
+        }
+
+        String uploadDir = "videos/attack/" + attack.getId();
+
+        try {
+            if (preVideoFile != null && !preVideoFile.isEmpty()) {
+                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
+            }
+            if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+
+        return "redirect:/dashboard/?attackSaved=true";
+    }
+
     @GetMapping("/attack/edit/{id}")
-    public String editAttackView(Model model,@PathVariable("id") int id  ) {
+    public String editAttackView(Model model, @PathVariable("id") int id) {
 
         UserProfile userProfile = userService.getCurrentUser().getUserProfile();
         Attack attack = attackService.getOneById(id);
@@ -264,15 +262,19 @@ public class AttackController {
 
         return "edit-attack";
     }
+
     @PostMapping("/attack/update")
     public String udpateAttack(@Valid Attack attack,
                                BindingResult bindingResult,
                                @RequestParam("preVideoFile") MultipartFile preVideoFile,
                                @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
                                Model model) {
+        List<TypeAttack> typeAttacks = typeAttackService.getAll();
+        typeAttacks = typeAttackService.getAll();
+
         if (bindingResult.hasErrors()) {
             UserProfile userProfile = userService.getCurrentUser().getUserProfile();
-            List<TypeAttack> typeAttacks = typeAttackService.getAll();
+
 
             model.addAttribute("attack", attack);
             model.addAttribute("typeAttacks", typeAttacks);
@@ -280,57 +282,24 @@ public class AttackController {
 
             return "edit-attack";
         }
-
-
-        if(preVideoFile != null && !preVideoFile.isEmpty()){
-            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-            Video preVideo = new Video(attack, VideoType.PRE);
-            preVideo.setDifficulty(attack.getDifficulty());
-            preVideo.setTitle(attack.getVideos().get(0).getTitle());
-            preVideo.setTypeAttack(attack.getTypeAttack());
-            preVideo.setVideoFile(preFilename);
-            attack.getVideos().add(0,preVideo);
-        }
-
-        if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
-            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-            Video solutionVideo = new Video(attack, VideoType.SOLUTION);
-            solutionVideo.setDifficulty(attack.getDifficulty());
-            solutionVideo.setTitle(attack.getVideos().get(1).getTitle());
-            solutionVideo.setTypeAttack(attack.getTypeAttack());
-            solutionVideo.setVideoFile(solutionFilename);
-            attack.getVideos().add(1,solutionVideo);
-        }
-
-
-        String uploadDir = "videos/attack/" + attack.getId();
-
-        try{
-            if(preVideoFile != null && !preVideoFile.isEmpty()) {
-                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-                FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
-            }
-            if(solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
-                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-                FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
-            }
-        }catch (Exception exc){
-            exc.printStackTrace();
-        }
-
-
-
         try {
-            attackService.save(attack);
+            attackService.updateAttackWithVideos(attack, preVideoFile, solutionVideoFile);
+
         } catch (DataIntegrityViolationException e) {
-            model.addAttribute("error", "El docker image name ya existe");
-            return "add-attack";
+            e.printStackTrace();
+            model.addAttribute("error", "Ya existe un laboratorio con esa imagen");
+            model.addAttribute("typeAttacks", typeAttacks);
+            return "edit-attack";
+        }catch (IOException e){
+            e.printStackTrace();
+            logger.info("Error al manipular los videos");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return "edit-attack";
+
         }
 
 
-
-
-
-        return "df";
+        return "redirect:/dashboard/";
     }
 }

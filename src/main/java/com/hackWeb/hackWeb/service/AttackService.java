@@ -1,13 +1,18 @@
 package com.hackWeb.hackWeb.service;
 
 import com.hackWeb.hackWeb.entity.*;
+import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.repository.AttackRepository;
+import com.hackWeb.hackWeb.util.FileUploadUtil;
 import jakarta.transaction.Transactional;
-import org.aspectj.weaver.bcel.AtAjAttributes;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,7 +27,8 @@ public class AttackService {
     public List<Attack> getAll() {
         return attackRepository.findAll();
     }
-    public Attack getOneById(int id){
+
+    public Attack getOneById(int id) {
         return attackRepository.findById(id).orElseThrow(() -> new RuntimeException("Attack not found"));
     }
 
@@ -35,16 +41,16 @@ public class AttackService {
 
     public List<AttackDto> searchDto(String attackTitle, List<String> difficulties, List<String> typeAttacks, int userId) {
 
-        List<IAttack> iAttacks = attackRepository.searchDto(difficulties,typeAttacks,attackTitle, userId);
+        List<IAttack> iAttacks = attackRepository.searchDto(difficulties, typeAttacks, attackTitle, userId);
 
-        
-        return  iAttacks.stream()
+
+        return iAttacks.stream()
                 .map(this::convertToAttackDto)
                 .collect(Collectors.toList());
     }
 
-    private AttackDto convertToAttackDto(IAttack ia){
-        TypeAttack typeAttack = new TypeAttack(ia.getTypeAttackId(),ia.getTypeAttackName());
+    private AttackDto convertToAttackDto(IAttack ia) {
+        TypeAttack typeAttack = new TypeAttack(ia.getTypeAttackId(), ia.getTypeAttackName());
         boolean isSaved = ia.getIsSaved() != null && ia.getIsSaved() == 1;
         boolean isCompleted = ia.getIsCompleted() != null && ia.getIsCompleted() == 1;
 
@@ -72,7 +78,7 @@ public class AttackService {
         return convertToAttackDto(iAttack);
     }
 
-    public Attack getOneByDockerImageName(String dockerImageName){
+    public Attack getOneByDockerImageName(String dockerImageName) {
         return attackRepository.findByDockerImageName(dockerImageName);
     }
 
@@ -80,4 +86,89 @@ public class AttackService {
     public void save(Attack attack) {
         attackRepository.save(attack);
     }
+
+    @Transactional
+    public void updateAttackWithVideos(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) throws IOException {
+
+        List<Video> existingVideos = attackRepository.findById(attack.getId()).orElseThrow(() -> new RuntimeException("No attack with that id")).getVideos();
+
+        String uploadDir = "videos/attack/" + attack.getId();
+
+        removeVideosIfExists(preVideoFile,solutionVideoFile, uploadDir, existingVideos);
+
+        List<Video> videosToSave = processVideoFiles(attack,preVideoFile,solutionVideoFile);
+        existingVideos.addAll(videosToSave);
+        attack.setVideos(existingVideos);
+
+
+
+        attackRepository.save(attack);
+
+
+        saveVideoFiles(uploadDir,preVideoFile,solutionVideoFile);
+
+
+    }
+
+    private void removeVideosIfExists(MultipartFile preVideoFile, MultipartFile solutionVideoFile, String uploadDir, List<Video> existingVideos) {
+
+        existingVideos.removeIf(video -> video.getVideoFile() == null);
+
+        if(preVideoFile != null && !preVideoFile.isEmpty()){
+            existingVideos.removeIf( video -> {
+                if(video.getType() == VideoType.PRE){
+                    FileUploadUtil.deleteFile(uploadDir, video.getVideoFile());
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
+            existingVideos.removeIf( video -> {
+                if(video.getType() == VideoType.SOLUTION){
+                    FileUploadUtil.deleteFile(uploadDir, video.getVideoFile());
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+
+    private void saveVideoFiles(String uploadDir, MultipartFile preVideoFile, MultipartFile solutionVideoFile) throws IOException {
+        if (preVideoFile != null && !preVideoFile.isEmpty()) {
+            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+            FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
+        }
+        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+            FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+        }
+    }
+
+    private List<Video> processVideoFiles(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) {
+        List<Video> videosToSave = new ArrayList<>();
+
+        if (preVideoFile != null && !preVideoFile.isEmpty()) {
+            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+            Video preVideo = new Video(attack, VideoType.PRE);
+            preVideo.setDifficulty(attack.getDifficulty());
+            preVideo.setTypeAttack(attack.getTypeAttack());
+            preVideo.setVideoFile(preFilename);
+            videosToSave.add(preVideo);
+        }
+
+        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+            Video solutionVideo = new Video(attack, VideoType.SOLUTION);
+            solutionVideo.setDifficulty(attack.getDifficulty());
+            solutionVideo.setTypeAttack(attack.getTypeAttack());
+            solutionVideo.setVideoFile(solutionFilename);
+            videosToSave.add(solutionVideo);
+        }
+
+        return videosToSave;
+    }
+
+
 }

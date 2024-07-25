@@ -69,6 +69,8 @@
 
                 </div>
             </div>
+            <hr>
+            <label class="heading_font font_sub_heading_color">Info base de datos (Opcional)</label>
             <div class="row">
                 <div class="col-md-4 form-group">
                     <input id="init_sql_path_name" th:field="*{initSqlPathName}" type="text" class="form-control"
@@ -81,6 +83,7 @@
                     <div th:if="${#fields.hasErrors('databaseName')}" th:errors="*{databaseName}" class="text-danger"></div>
                 </div>
             </div>
+            <hr>
             <div class="row">
                 <div class="col-md-12 form-group">
                     <label class="mt-2 heading_font font_sub_heading_color">Descripción</label>
@@ -90,15 +93,11 @@
 
                 </div>
             </div>
+            <hr>
 
             <label class="mt-2 heading_font font_sub_heading_color">Pre Video</label>
             <div class="row">
-                <div class="col-md-4 form-group">
-                    <input th:field="*{videos[0].title}" id="preTitle" type="text" class="form-control"
-                           placeholder="Título">
-                    <div th:if="${#fields.hasErrors('videos[0].title')}" th:errors="*{videos[0].title}" class="text-danger"></div>
 
-                </div>
                 <div class="col-md-4 form-group">
                     <input
                             type="file"
@@ -111,11 +110,7 @@
 
             <label class="mt-2 heading_font font_sub_heading_color">Solution Video</label>
             <div class="row">
-                <div class="col-md-4 form-group">
-                    <input th:field="*{videos[1].title}" id="solutionTitle" type="text" class="form-control"
-                           placeholder="Título">
-                    <div th:if="${#fields.hasErrors('videos[1].title')}" th:errors="*{videos[1].title}" class="text-danger"></div>
-                </div>
+
                 <div class="col-md-4 form-group">
                     <input
                             type="file"
@@ -125,6 +120,7 @@
                     />
                 </div>
             </div>
+            <hr>
 
             <label class="mt-2 heading_font font_sub_heading_color">Pregunta</label>
             <div class="row">

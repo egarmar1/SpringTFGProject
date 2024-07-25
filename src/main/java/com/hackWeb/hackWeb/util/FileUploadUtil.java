@@ -29,4 +29,13 @@ public class FileUploadUtil {
             throw new IOException("Could not safe file: " + filename, ioException);
         }
     }
+    public static void deleteFile(String uploadDir, String filename){
+        Path filePath = Paths.get(uploadDir,filename);
+
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            e.printStackTrace(); // Aquí puedes manejar el error según sea necesario
+        }
+    }
 }

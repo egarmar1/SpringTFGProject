@@ -3,7 +3,6 @@ package com.hackWeb.hackWeb.entity;
 public class VideoDto {
 
     private int id;
-    private String title;
 
     private String difficulty;
 
@@ -17,9 +16,8 @@ public class VideoDto {
 
     private boolean completed;
 
-    public VideoDto(int id, String title, String difficulty, String videoFile, Attack attack, TypeAttack typeAttack, boolean saved, boolean completed) {
+    public VideoDto(int id, String difficulty, String videoFile, Attack attack, TypeAttack typeAttack, boolean saved, boolean completed) {
         this.id = id;
-        this.title = title;
         this.difficulty = difficulty;
         this.videoFile = videoFile;
         this.attack = attack;
@@ -34,14 +32,6 @@ public class VideoDto {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDifficulty() {
@@ -96,7 +86,6 @@ public class VideoDto {
     public String toString() {
         return "VideoDto{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", video_file='" + videoFile + '\'' +
                 ", attack=" + attack.getTitle() +
