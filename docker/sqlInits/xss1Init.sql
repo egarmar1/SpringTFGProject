@@ -12,7 +12,7 @@ USE xss1Web;
 CREATE TABLE product (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(500),
-    description VARCHAR(255),
+    description VARCHAR(500),
      price DECIMAL(19, 2),
     available BOOLEAN
 );
@@ -39,7 +39,7 @@ INSERT INTO user_type (name) VALUES ("Admin");
 
 -- Introducimos usuarios
 INSERT INTO user (id, username, is_active, password, registration_date, user_type_id) VALUES
-(1, 'user', 1, '$2a$10$4.KQcK.kjx1.sErGgNJDn.WTNSi0GLzZHi51EDLIb0ctbpqLMPeJy', '2024-06-12', 1), -- Su password es user123
+(1, 'user', 1, '$2a$10$NqLlFiR.OzplBL0.M794BeXnyUl/cJEgLtHKlPbuVcAmCBf0DI3Ni', '2024-06-12', 1), -- Su password es asdfasdf
 (2, 'admin', 1, '$2a$10$YrDjNt3LHeOzTb9PVXNEVuvE2.gTJpd0BuuZBIQ6mIXgkeTECkE.S', '2024-06-12', 2); -- Su password es Admin123$
 
 
@@ -53,7 +53,7 @@ INSERT INTO product (name, description, price, available) VALUES
 ('Camera', 'A digital camera with 4K video recording.', 599.99, false),
 ('Printer', 'A wireless all-in-one printer.', 149.99, false),
 ('Monitor', 'A 27-inch 4K UHD monitor.', 349.99, false),
-('Keyboard', 'A mechanical keyboard with RGB backlighting.', 89.99, false)
-
+('Keyboard', 'A mechanical keyboard with RGB backlighting.', 89.99, false),
+('Flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 49.99, false);
 
 
