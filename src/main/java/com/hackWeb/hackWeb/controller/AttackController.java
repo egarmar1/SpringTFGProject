@@ -116,7 +116,6 @@ public class AttackController {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
 
 
-            String username = authentication.getName();
             User user = userService.getCurrentUser();
             model.addAttribute("user", user.getUserProfile());
 

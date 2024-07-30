@@ -82,7 +82,7 @@ CREATE TABLE user_attack(
 CREATE TABLE video (
     id INT PRIMARY KEY AUTO_INCREMENT,
     difficulty VARCHAR(50) NOT NULL,
-    video_file VARCHAR(255) UNIQUE,
+    video_file VARCHAR(255),
     type ENUM('PRE', 'SOLUTION') NOT NULL,
     attack_id INT,
     type_attack_id INT,
@@ -129,7 +129,8 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 (2, 'Path traversal'),
 (3, 'XSS'),
 (4, 'CSRF'),
-(5, 'Escalada Privilegios');
+(5, 'Escalada Privilegios'),
+(6, 'SSFR');
 
 
 -- Introducimos ataques
@@ -137,14 +138,15 @@ INSERT INTO hackweb.type_attack (id, name) VALUES
 
 INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, description, posted_date , docker_image_name, init_sql_path_name, database_name) VALUES
 (1, 'The first sql attack', 'Easy', 1,'Introduce el flag', '23bdss', 'En este laboratorio practicaremos un ejemplo básico de SQLI. Accede al localhost:8082 del laboratorio y ejecuta un SQLI para conseguir la flag.', '2024-05-23' ,'sqli-lab', 'sqli1Init.sql', 'sqli1Web'),
-(2, 'Basic XSS attack', 'Easy', 3, 'Introduce el flag', '$2b', 'Este laboratorio está diseñado para practicar un ejemplo del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador y obtener el flag. Accede al localhost:8082 con las credenciales: "user1" "asdfasdf". En la ruta root/app tienes un script en python que al ejecutarlo crea un servidor que se pone en escucha de cookies :),  utiliza sublime text como el IDE, para programar el código en js que vas a inyectar.','2024-06-10',  'xss1-lab', 'xss1Init.sql', 'xss1Web'),
+(2, 'Basic XSS attack', 'Medium', 3, 'Introduce el flag', '$2b', 'Este laboratorio está diseñado para practicar un ejemplo del ataque de Cross-Site Scripting (XSS). En este entorno controlado, un administrador se logueará automáticamente cada 2 minutos. El objetivo del ejercicio es explotar una vulnerabilidad XSS en la aplicación web para obtener acceso a la cuenta del administrador y obtener el flag. Accede al localhost:8082 con las credenciales: "user1" "asdfasdf". En la ruta root/app tienes un script en python que al ejecutarlo crea un servidor que se pone en escucha de cookies :),  utiliza sublime text como el IDE, para programar el código en js que vas a inyectar.','2024-06-10',  'xss1-lab', 'xss1Init.sql', 'xss1Web'),
 (6, 'Basic CSRF attack', 'Easy', 4, 'Introduce el flag', '$8c$', 'Este laboratorio está diseñado para practicar un ejemplo básico del ataque de Cross-Site Request Forgery (CSRF). En este entorno controlado, un administrador (no muy avispado) leerá los mensajes que le deje los clientes de la web. Accede al localhost/login.php del laboratorio con las credenciales del usuario: "user1" "asdf" y accede a la cuenta del administrador','2024-06-10',  'csrf-lab', '', ''),
-(7, 'Escalada por Suid Linux ', 'Easy', 4, 'Cual es la flag del archivo /root/flag.txt', 'premio123', 'Este laboratorio está diseñado para practicar una escalada de privilegios en Linux. En este entorno controlado, hay un binario suid que est vulnerable. Busca por la terminal xfce(En la lupa de la barra inferior dentro del laboratorio) y procede a buscar este binario','2024-06-10',  'suid-lab', '', '');
+(7, 'Escalada por Suid Linux ', 'Easy', 5, 'Cual es la flag del archivo /root/flag.txt', 'premio123', 'Este laboratorio está diseñado para practicar una escalada de privilegios en Linux. En este entorno controlado, hay un binario suid que est vulnerable. Busca por la terminal xfce(En la lupa de la barra inferior dentro del laboratorio) y procede a buscar este binario','2024-06-10',  'suid-lab', '', ''),
+(8, 'Basic SSRF attack', 'Easy', 6, 'Cual es la flag del archivo /etc/passwd', 'ol3e', 'Este laboratorio está diseñado para practicar una escalada una taque SSRF. En este entorno controlado, hay una página web en el localhost/index.php, en la que se pueden enviar imágenes.','2024-07-29',  'ssrf-lab', '', '');
 
-INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, docker_image_name) VALUES
-(3, 'The second sql attack', 'Medium', 1, 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
-(4, 'The third sql attack', 'Hard', 1, 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
-(5, 'The final sql attack', 'Medium', 1, 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
+-- -INSERT INTO hackweb.attack (id, title, difficulty, type_attack_id, question, answer, docker_image_name) VALUES
+-- -(3, 'The second sql attack', 'Medium', 1, 'How many columns are there in the table product', 'f8b7b3a7c6f7e2d0a4a6c8cfa3a88b0e4e4f5c6e9a2b7e5d6c9f8e7a9d3c4a8b', 'sqli-lab2'),
+-- -(4, 'The third sql attack', 'Hard', 1, 'Introduce the flag', 'd7a5b3e1f2c4a6d8e0c9b4f5a7c8d9b2e1a3f4c5b6d8a9e0f1b2c3d4e5f6a7b8', 'sqli-lab3'),
+-- -(5, 'The final sql attack', 'Medium', 1, 'Introduce the flag', 'a4c5d6e7b8a9d0c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5', 'sqli-lab4');
 
 -- Introducimos usuarios
 INSERT INTO hackweb.user (id, email, is_active, password, registration_date, user_type_id) VALUES
@@ -172,11 +174,12 @@ INSERT INTO hackweb.user_attack (user_id, attack_id, saved, completed) VALUES
 INSERT INTO hackweb.video (difficulty, video_file, type, attack_id, type_attack_id) VALUES
 ( "Easy", "previoSQLI1.mp4", 'PRE', 1, 1),
 ( "Easy", "solutionSQLI1.mp4", 'SOLUTION', 1, 1),
+( "Medium", "basicXssAttack.mp4", 'PRE', 2, 3),
+( "Easy", "preCSRF.mp4", 'PRE', 6, 4),
+( "Easy", "preSSRF.mp4", 'PRE', 8, 6),
 ( "Easy", "suidPre.mov", 'PRE', 7, 5),
 ( "Easy", "suidSol.mov", 'SOLUTION', 7, 5);
 
 -- Introducimos user_video
 INSERT into user_video (user_id, video_id, saved, completed) VALUES
 (1,1,1,0);
-
-
