@@ -4,11 +4,13 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
 import com.hackWeb.hackWeb.entity.ContainerInfo;
+import com.hackWeb.hackWeb.exception.DockerConnectionException;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.repository.ContainerInfoRepository;
 import com.github.dockerjava.api.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.conn.HttpHostConnectException;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -122,8 +124,13 @@ public class DockerService {
     }
 
     private boolean networkExists(String networkName) {
-        return dockerClient.listNetworksCmd().exec().stream()
-                .anyMatch(network -> network.getName().equals(networkName));
+        try {
+            return dockerClient.listNetworksCmd().exec().stream()
+                    .anyMatch(network -> network.getName().equals(networkName));
+        }catch (RuntimeException exc){
+            throw new DockerConnectionException("Failed to connect to docker. Please ensure Docker is running", exc);
+        }
+
     }
 
     private String generateRandomString() {

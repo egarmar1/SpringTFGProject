@@ -16,7 +16,7 @@ public interface VideoRepository extends JpaRepository<Video, Integer> {
 
 
 
-    @Query(value = "SELECT v.id, v.difficulty, v.video_file, a.id AS attack_id, " +
+    @Query(value = "SELECT v.id, v.difficulty, v.video_file, v.type, a.id AS attack_id, " +
             "ta.id AS type_attack_id, ta.name AS type_attack_name, " +
             "uv.saved as is_saved, uv.completed as is_completed " +
             "FROM video v LEFT JOIN attack a ON a.id = v.attack_id " +

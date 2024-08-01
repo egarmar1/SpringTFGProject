@@ -9,6 +9,7 @@ public interface IVideo {
     String getDifficulty();
 
     String getVideoFile();
+    String getType();
     Integer getAttackId();
 
     Integer getTypeAttackId();

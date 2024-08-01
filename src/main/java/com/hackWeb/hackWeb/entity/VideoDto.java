@@ -8,6 +8,8 @@ public class VideoDto {
 
     private String videoFile;
 
+    private String type;
+
     private Attack attack;
 
     private TypeAttack typeAttack;
@@ -16,7 +18,7 @@ public class VideoDto {
 
     private boolean completed;
 
-    public VideoDto(int id, String difficulty, String videoFile, Attack attack, TypeAttack typeAttack, boolean saved, boolean completed) {
+    public VideoDto(int id, String difficulty, String videoFile, String type, Attack attack, TypeAttack typeAttack, boolean saved, boolean completed) {
         this.id = id;
         this.difficulty = difficulty;
         this.videoFile = videoFile;
@@ -24,6 +26,7 @@ public class VideoDto {
         this.typeAttack = typeAttack;
         this.saved = saved;
         this.completed = completed;
+        this.type = type;
     }
 
     public int getId() {
@@ -93,6 +96,14 @@ public class VideoDto {
                 ", saved=" + saved +
                 ", completed=" + completed +
                 '}';
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
 

@@ -175,7 +175,7 @@ INSERT INTO hackweb.video (difficulty, video_file, type, attack_id, type_attack_
 ( "Easy", "previoSQLI1.mp4", 'PRE', 1, 1),
 ( "Easy", "solutionSQLI1.mp4", 'SOLUTION', 1, 1),
 ( "Medium", "basicXssAttack.mp4", 'PRE', 2, 3),
-( "Medium", "solXss1.mp4", 'SOLUTION', 2, 3),
+( "Medium", "solXss1Basic.mp4", 'SOLUTION', 2, 3),
 ( "Easy", "preCSRFBasic.mp4", 'PRE', 6, 4),
 ( "Easy", "solCSRFBasic.mp4", 'SOLUTION', 6, 4),
 ( "Easy", "preSSRFBasic.mp4", 'PRE', 8, 6),

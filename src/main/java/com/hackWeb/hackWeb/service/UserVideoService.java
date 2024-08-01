@@ -68,7 +68,7 @@ public class UserVideoService {
 //        boolean isSaved = ia.getIsSaved() != null && ia.getIsSaved() == 1;
 //        boolean isCompleted = ia.getIsCompleted() != null && ia.getIsCompleted() == 1;
 
-        return new VideoDto(ia.getId(),ia.getDifficulty(),ia.getVideoFile(),attack, typeAttack, ia.getIsSaved(),ia.getIsCompleted());
+        return new VideoDto(ia.getId(),ia.getDifficulty(),ia.getVideoFile(), ia.getType() ,attack, typeAttack, ia.getIsSaved(),ia.getIsCompleted());
 
     }
 }
