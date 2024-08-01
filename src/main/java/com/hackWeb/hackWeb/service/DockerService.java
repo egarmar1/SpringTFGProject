@@ -59,10 +59,6 @@ public class DockerService {
             Thread.sleep(5000);
         }
 
-
-
-
-
             // Crear el contenedor de la aplicación Spring Boot
             String springDatasourceUrl = "SPRING_DATASOURCE_URL=jdbc:mysql://" + uniqueMySQLContainerName + ":3306/" + databaseName;
             CreateContainerResponse appContainer = createAppContainer(imageName, vncPassword, containerHostPort, networkName, springDatasourceUrl);
