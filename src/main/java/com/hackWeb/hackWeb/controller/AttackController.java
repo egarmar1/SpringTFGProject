@@ -197,6 +197,7 @@ public class AttackController {
             return "add-attack";
         }
 
+        attackService.addAttackWithVideos(attack, preVideoFile, solutionVideoFile);
         List<Video> videosToSave = new ArrayList<>();
 
         if (preVideoFile != null && !preVideoFile.isEmpty()) {
@@ -245,11 +246,20 @@ public class AttackController {
         }
 
 
-        return "redirect:/dashboard/?attackSaved=true";
+        return "redirect:/dashboard/?attackCreated=true";
+    }
+
+    @PostMapping("/attack/delete/{id}")
+    public String deleteAttack(@PathVariable("id") int attackId) {
+
+        attackService.delete(attackId);
+
+        return "redirect:/dashboard/?attackDeleted=true";
     }
 
     @GetMapping("/attack/edit/{id}")
     public String editAttackView(Model model, @PathVariable("id") int id) {
+
 
         UserProfile userProfile = userService.getCurrentUser().getUserProfile();
         Attack attack = attackService.getOneById(id);
@@ -269,7 +279,6 @@ public class AttackController {
                                @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
                                Model model) {
         List<TypeAttack> typeAttacks = typeAttackService.getAll();
-        typeAttacks = typeAttackService.getAll();
 
         if (bindingResult.hasErrors()) {
             UserProfile userProfile = userService.getCurrentUser().getUserProfile();
@@ -281,22 +290,8 @@ public class AttackController {
 
             return "edit-attack";
         }
-        try {
-            attackService.updateAttackWithVideos(attack, preVideoFile, solutionVideoFile);
 
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Ya existe un laboratorio con esa imagen");
-            model.addAttribute("typeAttacks", typeAttacks);
-            return "edit-attack";
-        }catch (IOException e){
-            e.printStackTrace();
-            logger.info("Error al manipular los videos");
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            return "edit-attack";
-
-        }
+        attackService.updateAttackWithVideos(attack, preVideoFile, solutionVideoFile);
 
 
         return "redirect:/dashboard/";

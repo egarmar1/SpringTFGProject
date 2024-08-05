@@ -26,13 +26,13 @@
     <div class="sidenav px-5">
         <div sec:authorize="hasAuthority('Student') or hasAuthority('Admin')">
 
-            <label class="text-uppercase color-dull font-weight-bold">Filter Results</label>
+            <label class="text-uppercase color-dull font-weight-bold">Filtros</label>
             <hr/>
             <form id="myForm" th:action="@{/dashboard/}">
 
                 <div class="row">
                     <div class="col-lg-12">
-                        <label>Type of Attack</label>
+                        <label>Tipo de ataque</label>
                         <div th:each="typeAttack : ${typeAttacks}" class="form-check">
                             <input
                                     class="form-check-input"
@@ -98,15 +98,21 @@
     </div>
     <article>
         <div class="box" sec:authorize="hasAuthority('Student') or hasAuthority('Admin')">
-            <h1 class="primary-title">Student Dashboard</h1>
+            <h1 class="primary-title">Home</h1>
             <div class="inner">
-                <input id="attack" class="radius-left" type="text" placeholder="Search for an attack" name="attack"
+                <input id="attack" class="radius-left" type="text" placeholder="Buscar por un ataque" name="attack"
                        th:value="${attack}"/>
                 <!--                            <input id="difficulty" class="" type="text" placeholder="Difficulty" name="location" th:value="${difficulty}"/>-->
                 <button class="radius-right" type="submit" form="myForm"><i class="fa fa-search"></i></button>
             </div>
         </div>
 
+        <div th:if="${param.attackCreated}" class="alert alert-success">
+            Attack created
+        </div>
+        <div th:if="${param.attackDeleted}" class="alert alert-danger">
+            Attack deleted
+        </div>
         <div th:if="${param.justSaved}" class="alert alert-success">
             Attack saved
         </div>
@@ -120,6 +126,7 @@
         <div th:if="${param.justUncompleted}" class="alert alert-success">
             Attack marked as uncompleted
         </div>
+
 
         <div class="box mt-3">
             <label class="large-label px-3 mb-3" sec:authorize="hasAuthority('Student')">Resultados de la búsqueda</label>

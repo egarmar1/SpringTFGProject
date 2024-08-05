@@ -2,9 +2,11 @@ package com.hackWeb.hackWeb.service;
 
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
+import com.hackWeb.hackWeb.exception.*;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,37 +88,48 @@ public class AttackService {
     public void save(Attack attack) {
         attackRepository.save(attack);
     }
+//
+//    @Transactional
+    public void updateAttackWithVideos(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) {
+        try {
 
-    @Transactional
-    public void updateAttackWithVideos(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) throws IOException {
+            List<Video> existingVideos = attackRepository.findById(attack.getId()).orElseThrow(() -> new RuntimeException("No attack with that id")).getVideos();
 
-        List<Video> existingVideos = attackRepository.findById(attack.getId()).orElseThrow(() -> new RuntimeException("No attack with that id")).getVideos();
+            String uploadDir = "videos/attack/" + attack.getId();
 
-        String uploadDir = "videos/attack/" + attack.getId();
+            removeVideosIfExists(preVideoFile, solutionVideoFile, uploadDir, existingVideos);
 
-        removeVideosIfExists(preVideoFile,solutionVideoFile, uploadDir, existingVideos);
+            List<Video> videosToSave = processVideoFiles(attack, preVideoFile, solutionVideoFile);
+            existingVideos.addAll(videosToSave);
+            attack.setVideos(existingVideos);
 
-        List<Video> videosToSave = processVideoFiles(attack,preVideoFile,solutionVideoFile);
-        existingVideos.addAll(videosToSave);
-        attack.setVideos(existingVideos);
+            attackRepository.save(attack);
+
+            saveVideoFiles(uploadDir, preVideoFile, solutionVideoFile);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new ImageAttackExistsOnUpdateException("That image is already used by another attack", e);
+        } catch (Exception exc) {
+            throw new GeneralExceptionWithContext("Unexpected Exception", exc, "edit-attack");
+        }
 
 
+    }
 
-        attackRepository.save(attack);
-
-
-        saveVideoFiles(uploadDir,preVideoFile,solutionVideoFile);
-
-
+    public void delete(int attackId) {
+        if (!attackRepository.existsById(attackId)) {
+            throw new AttackNotFoundException("The attack with id: " + attackId + " wasn't found");
+        }
+        attackRepository.deleteById(attackId);
     }
 
     private void removeVideosIfExists(MultipartFile preVideoFile, MultipartFile solutionVideoFile, String uploadDir, List<Video> existingVideos) {
 
         existingVideos.removeIf(video -> video.getVideoFile() == null);
 
-        if(preVideoFile != null && !preVideoFile.isEmpty()){
-            existingVideos.removeIf( video -> {
-                if(video.getType() == VideoType.PRE){
+        if (preVideoFile != null && !preVideoFile.isEmpty()) {
+            existingVideos.removeIf(video -> {
+                if (video.getType() == VideoType.PRE) {
                     FileUploadUtil.deleteFile(uploadDir, video.getVideoFile());
                     return true;
                 }
@@ -124,9 +137,9 @@ public class AttackService {
             });
         }
 
-        if(solutionVideoFile != null && !solutionVideoFile.isEmpty()){
-            existingVideos.removeIf( video -> {
-                if(video.getType() == VideoType.SOLUTION){
+        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+            existingVideos.removeIf(video -> {
+                if (video.getType() == VideoType.SOLUTION) {
                     FileUploadUtil.deleteFile(uploadDir, video.getVideoFile());
                     return true;
                 }
@@ -135,14 +148,18 @@ public class AttackService {
         }
     }
 
-    private void saveVideoFiles(String uploadDir, MultipartFile preVideoFile, MultipartFile solutionVideoFile) throws IOException {
-        if (preVideoFile != null && !preVideoFile.isEmpty()) {
-            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-            FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
-        }
-        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
-            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-            FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+    private void saveVideoFiles(String uploadDir, MultipartFile preVideoFile, MultipartFile solutionVideoFile) {
+        try {
+            if (preVideoFile != null && !preVideoFile.isEmpty()) {
+                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
+            }
+            if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
+                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
+                FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
+            }
+        } catch (IOException e) {
+            throw new PhisicallySaveVideoException("There was an error trying to save the physical video locally", e);
         }
     }
 
@@ -171,4 +188,20 @@ public class AttackService {
     }
 
 
+    public void addAttackWithVideos(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) {
+        try {
+            Attack savedAttack = attackRepository.save(attack);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new ImageAttackExistsOnCreationException("That image is already used by another attack", e);
+        }
+
+        String uploadDir = "videos/attack/" + attack.getId();
+        List<Video> videosToSave = processVideoFiles(attack, preVideoFile, solutionVideoFile);
+        attack.setVideos(videosToSave);
+
+        saveVideoFiles(uploadDir, preVideoFile, solutionVideoFile);
+
+
+    }
 }

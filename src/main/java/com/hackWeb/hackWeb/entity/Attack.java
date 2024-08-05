@@ -36,7 +36,7 @@ public class Attack {
 
 
     @OneToMany(mappedBy = "attack", cascade = CascadeType.ALL, orphanRemoval = true)
-    //// De esta manera si eliminamos un video de la lista se eliminara de la base de datos;
+    //// De esta manera si eliminamos un video de la lista de attack y guardamos este attack, entonces se eliminara el video de la base de datos;
     private List<Video> videos;
 
     @Size(max = 255)
@@ -52,7 +52,7 @@ public class Attack {
     private String initSqlPathName;
 
     private String databaseName;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "attack")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attack" , orphanRemoval = true)
     private List<UserAttack> userAttacks;
 
     public Attack() {

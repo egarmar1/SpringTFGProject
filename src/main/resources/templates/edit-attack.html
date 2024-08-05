@@ -69,6 +69,8 @@
 
                 </div>
             </div>
+            <hr>
+            <label class="heading_font font_sub_heading_color">Info base de datos</label>
             <div class="row">
                 <div class="col-md-4 form-group">
                     <input id="init_sql_path_name" th:field="*{initSqlPathName}" type="text" class="form-control"
@@ -81,6 +83,7 @@
                     <div th:if="${#fields.hasErrors('databaseName')}" th:errors="*{databaseName}" class="text-danger"></div>
                 </div>
             </div>
+            <hr>
             <div class="row">
                 <div class="col-md-12 form-group">
                     <label class="mt-2 heading_font font_sub_heading_color">Descripción</label>
