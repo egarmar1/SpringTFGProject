@@ -2,6 +2,8 @@ package com.hackWeb.hackWeb.controller;
 
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
+import com.hackWeb.hackWeb.exception.ImageAttackExistsOnCreationException;
+import com.hackWeb.hackWeb.exception.ImageAttackExistsOnUpdateException;
 import com.hackWeb.hackWeb.exception.MyException;
 import com.hackWeb.hackWeb.service.*;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
@@ -185,10 +187,10 @@ public class AttackController {
                                @RequestParam("solutionVideoFile") MultipartFile solutionVideoFile,
                                Model model) {
 
-
+        List<TypeAttack> typeAttacks = typeAttackService.getAll();
         if (bindingResult.hasErrors()) {
             UserProfile userProfile = userService.getCurrentUser().getUserProfile();
-            List<TypeAttack> typeAttacks = typeAttackService.getAll();
+
 
             model.addAttribute("attack", attack);
             model.addAttribute("typeAttacks", typeAttacks);
@@ -197,54 +199,15 @@ public class AttackController {
             return "add-attack";
         }
 
-        attackService.addAttackWithVideos(attack, preVideoFile, solutionVideoFile);
-        List<Video> videosToSave = new ArrayList<>();
-
-        if (preVideoFile != null && !preVideoFile.isEmpty()) {
-            String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-            Video preVideo = new Video(attack, VideoType.PRE);
-            preVideo.setDifficulty(attack.getDifficulty());
-            preVideo.setTypeAttack(attack.getTypeAttack());
-            preVideo.setVideoFile(preFilename);
-            videosToSave.add(preVideo);
-        }
-
-        if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
-            String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-            Video solutionVideo = new Video(attack, VideoType.SOLUTION);
-            solutionVideo.setDifficulty(attack.getDifficulty());
-            solutionVideo.setTypeAttack(attack.getTypeAttack());
-            solutionVideo.setVideoFile(solutionFilename);
-            videosToSave.add(solutionVideo);
-        }
-
-
-        attack.setVideos(videosToSave);
-        attack.setPosted_date(new Date());
-
         try {
-            attackService.save(attack);
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Ya existe un laboratorio con esa imagen");
+            attackService.addAttackWithVideos(attack, preVideoFile, solutionVideoFile);
+        }catch (ImageAttackExistsOnCreationException e){
+            logger.info("Image already exists");
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("attack", attack);
+            model.addAttribute("typeAttacks", typeAttacks);
             return "add-attack";
         }
-
-        String uploadDir = "videos/attack/" + attack.getId();
-
-        try {
-            if (preVideoFile != null && !preVideoFile.isEmpty()) {
-                String preFilename = StringUtils.cleanPath(Objects.requireNonNull(preVideoFile.getOriginalFilename()));
-                FileUploadUtil.saveFile(uploadDir, preFilename, preVideoFile);
-            }
-            if (solutionVideoFile != null && !solutionVideoFile.isEmpty()) {
-                String solutionFilename = StringUtils.cleanPath(Objects.requireNonNull(solutionVideoFile.getOriginalFilename()));
-                FileUploadUtil.saveFile(uploadDir, solutionFilename, solutionVideoFile);
-            }
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-
 
         return "redirect:/dashboard/?attackCreated=true";
     }
@@ -291,8 +254,17 @@ public class AttackController {
             return "edit-attack";
         }
 
-        attackService.updateAttackWithVideos(attack, preVideoFile, solutionVideoFile);
+        try {
 
+            attackService.updateAttackWithVideos(attack, preVideoFile, solutionVideoFile);
+        } catch (ImageAttackExistsOnUpdateException e) {
+            logger.info("Image already exists");
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("attack", attack);
+            model.addAttribute("typeAttacks", typeAttacks);
+
+            return "edit-attack";
+        }
 
         return "redirect:/dashboard/";
     }

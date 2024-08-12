@@ -52,7 +52,7 @@ public class Attack {
     private String initSqlPathName;
 
     private String databaseName;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attack" , orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attack")
     private List<UserAttack> userAttacks;
 
     public Attack() {

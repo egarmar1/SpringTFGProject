@@ -16,6 +16,11 @@ RUN apt-get install -y xfce4-terminal
 
 RUN useradd -m -s /bin/bash user && echo 'user:user' | chpasswd && adduser user sudo
 
+
+# Instalar aplicaciones adicionales (ejemplo: Firefox y Gedit)
+RUN apt-get update && \
+    apt-get install -y --fix-missing firefox gedit
+
 # Configurar VNC
 RUN mkdir -p /home/user/.vnc && \
     chown -R user:user /home/user/.vnc

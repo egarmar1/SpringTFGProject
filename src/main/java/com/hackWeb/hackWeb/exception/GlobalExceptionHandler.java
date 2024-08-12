@@ -12,8 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +43,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DockerConnectionException.class)
     public ResponseEntity<Object> handleDockerConnectionException(DockerConnectionException ex, WebRequest request){
-        Map<String, Object> body = new HashMap<>();
+        logger.error("DockerConnectionException");
 
+        Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
 
@@ -63,14 +68,6 @@ public class GlobalExceptionHandler {
         return "add-attack";
     }
 
-    @ExceptionHandler(ImageAttackExistsOnUpdateException.class)
-    public String handleImageAttackExistsOnUpdateException(ImageAttackExistsOnCreationException ex, Model model){
-        logger.error("Handling ImageAttackExistsOnUpdateException: {}", ex.getMessage());
-        model.addAttribute("error", ex.getMessage());
-        model.addAttribute("typeAttacks", typeAttackService.getAll());
-
-        return "edit-attack";
-    }
     @ExceptionHandler(PhisicallySaveVideoException.class)
     public String handlePhisicallySaveVideoException(ImageAttackExistsOnCreationException ex, Model model){
         logger.error("Handling PhisicallySaveVideoException: {}", ex.getMessage());
@@ -86,12 +83,12 @@ public class GlobalExceptionHandler {
         return ex.getContext();
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public String handleGeneralException(Exception ex, Model model) {
-//
-//        logger.error("Handling General Exception: ", ex);
-//        model.addAttribute("error", "An unexpected error occurred: " + ex.getMessage());
-//        return "error";
-//    }
+    @ExceptionHandler(Exception.class)
+    public String handleGeneralException(Exception ex) {
+
+        logger.error("Handling unhandled Exception: ", ex);
+
+        return "/error";
+    }
 
 }

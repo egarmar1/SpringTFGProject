@@ -82,7 +82,7 @@
                     <!-- Video Section -->
                     <div class="row mt-3">
                         <div class="col-md-6 text-center" th:if="${preVideo != null}">
-                            <h3><a th:href="@{${'/video/watch/' + preVideo.id}}">Previous video</a></h3>
+                            <h3><a th:href="@{${'/video/watch/' + preVideo.id}}">Vídeo introductorio</a></h3>
                             <video width="600" controls>
                                 <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.preVideoFile}}"
                                         type="video/mp4">
@@ -91,7 +91,7 @@
                         </div>
                         <div class="col-md-6 text-center"
                              th:if="${attackDetails.completed == true && solVideo != null}">
-                            <h3><a th:href="@{${'/video/watch/' + solVideo.id}}">Solution video</a></h3>
+                            <h3><a th:href="@{${'/video/watch/' + solVideo.id}}">Vídeo con solución</a></h3>
                             <video width="600" controls>
                                 <source th:src="@{${'/videos/attack/' + attackDetails.id + '/' + attackDetails.solutionVideoFile}}"
                                         type="video/mp4">

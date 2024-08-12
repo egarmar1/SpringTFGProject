@@ -1,11 +1,14 @@
 package com.hackWeb.hackWeb.service;
 
+import com.hackWeb.hackWeb.controller.AttackController;
 import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.exception.*;
 import com.hackWeb.hackWeb.repository.AttackRepository;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,8 +22,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class AttackService {
-
+    private static final Logger logger = LoggerFactory.getLogger(AttackService.class);
     private final AttackRepository attackRepository;
+
 
     public AttackService(AttackRepository attackRepository) {
         this.attackRepository = attackRepository;
@@ -108,12 +112,11 @@ public class AttackService {
             saveVideoFiles(uploadDir, preVideoFile, solutionVideoFile);
 
         } catch (DataIntegrityViolationException e) {
+            logger.info("Before entering imageAttackExistsOnUpdate");
             throw new ImageAttackExistsOnUpdateException("That image is already used by another attack", e);
         } catch (Exception exc) {
             throw new GeneralExceptionWithContext("Unexpected Exception", exc, "edit-attack");
         }
-
-
     }
 
     public void delete(int attackId) {
@@ -190,17 +193,20 @@ public class AttackService {
 
     public void addAttackWithVideos(Attack attack, MultipartFile preVideoFile, MultipartFile solutionVideoFile) {
         try {
-            Attack savedAttack = attackRepository.save(attack);
+            String uploadDir = "videos/attack/" + attack.getId();
+            List<Video> videosToSave = processVideoFiles(attack, preVideoFile, solutionVideoFile);
+            attack.setVideos(videosToSave);
+
+            attackRepository.save(attack);
+            saveVideoFiles(uploadDir, preVideoFile, solutionVideoFile);
+
 
         } catch (DataIntegrityViolationException e) {
+            logger.info("Before entering imageAttackExistsOnUpdate");
             throw new ImageAttackExistsOnCreationException("That image is already used by another attack", e);
         }
 
-        String uploadDir = "videos/attack/" + attack.getId();
-        List<Video> videosToSave = processVideoFiles(attack, preVideoFile, solutionVideoFile);
-        attack.setVideos(videosToSave);
 
-        saveVideoFiles(uploadDir, preVideoFile, solutionVideoFile);
 
 
     }
