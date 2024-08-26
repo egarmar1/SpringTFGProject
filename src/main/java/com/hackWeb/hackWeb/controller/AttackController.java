@@ -4,7 +4,6 @@ import com.hackWeb.hackWeb.entity.*;
 import com.hackWeb.hackWeb.entity.enums.VideoType;
 import com.hackWeb.hackWeb.exception.ImageAttackExistsOnCreationException;
 import com.hackWeb.hackWeb.exception.ImageAttackExistsOnUpdateException;
-import com.hackWeb.hackWeb.exception.MyException;
 import com.hackWeb.hackWeb.service.*;
 import com.hackWeb.hackWeb.util.FileUploadUtil;
 import jakarta.validation.Valid;

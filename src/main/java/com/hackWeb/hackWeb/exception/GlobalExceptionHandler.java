@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,13 +79,13 @@ public class GlobalExceptionHandler {
 
         return ex.getContext();
     }
-
-    @ExceptionHandler(Exception.class)
-    public String handleGeneralException(Exception ex) {
-
-        logger.error("Handling unhandled Exception: ", ex);
-
-        return "/error";
-    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public String handleGeneralException(Exception ex) {
+//
+//        logger.error("Handling unhandled Exception: ", ex);
+//
+//        return "/error";
+//    }
 
 }

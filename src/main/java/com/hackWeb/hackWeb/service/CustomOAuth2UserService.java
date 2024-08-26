@@ -1,8 +1,6 @@
 package com.hackWeb.hackWeb.service;
 
 import com.hackWeb.hackWeb.entity.User;
-import com.hackWeb.hackWeb.exception.MyException;
-import com.hackWeb.hackWeb.exception.OAuth2UserNotFoundException;
 import com.hackWeb.hackWeb.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

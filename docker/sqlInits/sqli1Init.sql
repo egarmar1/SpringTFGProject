@@ -28,5 +28,5 @@ INSERT INTO product (name, description, price, available) VALUES
 ('Printer', 'A wireless all-in-one printer.', 149.99, false),
 ('Monitor', 'A 27-inch 4K UHD monitor.', 349.99, false),
 ('Keyboard', 'A mechanical keyboard with RGB backlighting.', 89.99, false),
-('Flag', '3e023bdebbbd2a68d7898d9a6f3e0f45b5dc8eebd1f1bfb5cd8d3c842c9cf073', 49.99, false);
+('Flag', '23bds$', 49.99, false);
 
